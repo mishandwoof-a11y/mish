@@ -333,6 +333,228 @@ body {
   color: var(--color-primary);
 }
 
+/* ── Botón flotante agregar (FAB) ────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 900;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(63,180,152,0.5);
+  transition: transform 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 6px 28px rgba(63,180,152,0.65);
+}
+
+/* ── Modal agregar producto ──────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.modal__box {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  overflow: hidden;
+  margin: auto;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal__title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-dark);
+}
+
+.modal__close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.modal__close:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── Formulario ──────────────────────────────────────────── */
+.product-form {
+  padding: 24px 28px 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-white);
+  transition: border-color 0.15s;
+  outline: none;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+/* Preview imagen */
+.form-img-preview {
+  margin-top: 6px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  max-height: 120px;
+}
+
+.form-img-preview img {
+  width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  background: var(--color-bg);
+  display: block;
+}
+
+.preview-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+}
+
+/* Botones del form */
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 4px;
+}
+
+.btn {
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.btn--primary:hover {
+  background: #33a085;
+  border-color: #33a085;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.btn--secondary:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+/* ── Botón eliminar en tarjetas ──────────────────────────── */
+.card__delete {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.85);
+  color: white;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  line-height: 1;
+}
+
+.card:hover .card__delete {
+  opacity: 1;
+}
+
+.card__delete:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
+}
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 520px) {
   .header__title {
@@ -346,5 +568,23 @@ body {
 
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .product-form {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .form-group--full {
+    grid-column: 1;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
   }
 }

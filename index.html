@@ -33,18 +33,13 @@
       <button class="filter-btn" data-filter="gato">🐱 Gatos</button>
     </section>
 
-    <!-- Contador de resultados -->
     <p class="results-count" id="resultsCount"></p>
 
-    <!-- ── GRILLA DE TARJETAS ─────────────────────────────── -->
-    <!-- Las tarjetas se generan automáticamente desde products.js -->
     <section class="grid" id="productsGrid" aria-live="polite"></section>
 
-    <!-- ── ESTADO VACÍO ───────────────────────────────────── -->
     <div class="empty-state" id="emptyState" style="display:none;">
       <span class="empty-icon">🐾</span>
-      <p>No hay productos en esta categoría todavía.<br>
-         Agregá productos en el archivo <code>products.js</code></p>
+      <p>No hay productos en esta categoría todavía.</p>
     </div>
 
   </main>
@@ -55,91 +50,235 @@
        <strong>mish &amp; woof Pet Shop</strong></p>
   </footer>
 
+  <!-- ── BOTÓN FLOTANTE AGREGAR ────────────────────────────── -->
+  <button class="fab" id="fabBtn" onclick="abrirFormulario()" title="Agregar producto">
+    +
+  </button>
 
-  <!-- Datos de productos (editá products.js para agregar productos) -->
+  <!-- ── MODAL AGREGAR PRODUCTO ────────────────────────────── -->
+  <div class="modal" id="productoModal" style="display:none;"
+       role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal__box">
+
+      <div class="modal__header">
+        <h2 class="modal__title" id="modalTitle">Agregar producto</h2>
+        <button class="modal__close" onclick="cerrarFormulario()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form id="productoForm" class="product-form" onsubmit="agregarProducto(event)">
+
+        <!-- Imagen -->
+        <div class="form-group form-group--full">
+          <label class="form-label" for="f-imagen">Imagen (URL)</label>
+          <input class="form-input" type="url" id="f-imagen" name="imagen"
+                 placeholder="https://ejemplo.com/imagen.jpg">
+          <div class="form-img-preview" id="imgPreview"></div>
+        </div>
+
+        <!-- Mascota -->
+        <div class="form-group">
+          <label class="form-label" for="f-mascota">Mascota *</label>
+          <select class="form-input form-select" id="f-mascota" name="mascota" required>
+            <option value="perro">🐶 Perro</option>
+            <option value="gato">🐱 Gato</option>
+          </select>
+        </div>
+
+        <!-- Estrellas -->
+        <div class="form-group">
+          <label class="form-label" for="f-estrellas">Estrellas (1–5) *</label>
+          <input class="form-input" type="number" id="f-estrellas" name="estrellas"
+                 min="1" max="5" value="5" required>
+        </div>
+
+        <!-- Marca -->
+        <div class="form-group">
+          <label class="form-label" for="f-marca">Marca *</label>
+          <input class="form-input" type="text" id="f-marca" name="marca"
+                 placeholder="Ej: Royal Canin" required>
+        </div>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="form-label" for="f-nombre">Nombre del producto *</label>
+          <input class="form-input" type="text" id="f-nombre" name="nombre"
+                 placeholder="Ej: Adult Medium Breed" required>
+        </div>
+
+        <!-- Precio -->
+        <div class="form-group">
+          <label class="form-label" for="f-precio">Precio por kg ($) *</label>
+          <input class="form-input" type="number" id="f-precio" name="precio_kg"
+                 min="0" placeholder="Ej: 12500" required>
+        </div>
+
+        <!-- Sabor -->
+        <div class="form-group">
+          <label class="form-label" for="f-sabor">Sabor</label>
+          <input class="form-input" type="text" id="f-sabor" name="sabor"
+                 list="sabores-list" placeholder="Ej: Pollo, Carne, Salmón">
+          <datalist id="sabores-list">
+            <option value="Pollo">
+            <option value="Carne vacuna">
+            <option value="Salmón">
+            <option value="Cordero">
+            <option value="Atún">
+            <option value="Pavo">
+            <option value="Mixto">
+          </datalist>
+        </div>
+
+        <!-- Tamaño bolso -->
+        <div class="form-group">
+          <label class="form-label" for="f-bolso">Tamaño del bolso (kg)</label>
+          <input class="form-input" type="number" id="f-bolso" name="tamano_bolso"
+                 min="0" step="0.5" placeholder="Ej: 15">
+        </div>
+
+        <!-- Proteína / Grasa / Humedad -->
+        <div class="form-group">
+          <label class="form-label" for="f-proteina">Proteína (%) *</label>
+          <input class="form-input" type="number" id="f-proteina" name="proteina"
+                 min="0" max="100" placeholder="Ej: 28" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-grasa">Grasa (%)</label>
+          <input class="form-input" type="number" id="f-grasa" name="grasa"
+                 min="0" max="100" placeholder="Ej: 14">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-humedad">Humedad (%)</label>
+          <input class="form-input" type="number" id="f-humedad" name="humedad"
+                 min="0" max="100" placeholder="Ej: 10">
+        </div>
+
+        <!-- Raza/tamaño dirigido -->
+        <div class="form-group form-group--full">
+          <label class="form-label" for="f-tamano">Raza / Tamaño dirigido</label>
+          <input class="form-input" type="text" id="f-tamano" name="tamano"
+                 placeholder="Ej: Razas medianas (11–25 kg)">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--secondary" onclick="cerrarFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn--primary">
+            Agregar producto
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Datos base de productos -->
   <script src="products.js"></script>
 
-  <!-- ── LÓGICA DE RENDERIZADO ──────────────────────────────── -->
   <script>
-    // Máximos de referencia para las barras nutricionales
-    // (ajustá si tus productos superan estos valores)
+    // ── Constantes ──────────────────────────────────────────
     const MAXIMOS = { proteina: 50, grasa: 30, humedad: 20 };
+    const LS_KEY  = 'mishwoof_user_productos';
 
+    // ── Productos usuario (persistidos en localStorage) ──────
+    function cargarUsuario() {
+      try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function guardarUsuario() {
+      localStorage.setItem(LS_KEY, JSON.stringify(productosUsuario));
+    }
+
+    let productosUsuario = cargarUsuario();
+    let filtroActual = 'todos';
+
+    // ── Helpers ──────────────────────────────────────────────
     function formatoPrecio(n) {
       return '$' + Number(n).toLocaleString('es-AR');
     }
 
     function renderEstrellas(n) {
-      const llenas = Math.max(0, Math.min(5, Math.round(n)));
-      return '★'.repeat(llenas) + '☆'.repeat(5 - llenas);
+      const l = Math.max(0, Math.min(5, Math.round(n)));
+      return '★'.repeat(l) + '☆'.repeat(5 - l);
     }
 
     function barraColor(campo) {
-      const colores = {
-        proteina: 'var(--color-primary)',
-        grasa:    '#f0a500',
-        humedad:  '#5ab4d6',
-      };
-      return colores[campo] || 'var(--color-primary)';
+      return { proteina: 'var(--color-primary)', grasa: '#f0a500', humedad: '#5ab4d6' }[campo]
+             || 'var(--color-primary)';
     }
 
     function renderBarra(valor, campo) {
-      const pct = Math.min((valor / MAXIMOS[campo]) * 100, 100).toFixed(1);
-      return `
-        <div class="nutri-bar">
-          <div class="nutri-fill"
-               style="width:${pct}%; background:${barraColor(campo)}">
-          </div>
-        </div>`;
+      const pct = Math.min(((valor || 0) / MAXIMOS[campo]) * 100, 100).toFixed(1);
+      return `<div class="nutri-bar">
+                <div class="nutri-fill" style="width:${pct}%;background:${barraColor(campo)}"></div>
+              </div>`;
     }
 
-    function renderTarjeta(p) {
-      // Imagen o placeholder con emoji
-      const imgHtml = p.imagen
-        ? `<img class="card__img"
-                src="${p.imagen}"
-                alt="${p.nombre} – ${p.marca}"
-                onerror="this.outerHTML='<div class=card__img-placeholder>${p.mascota === 'perro' ? '🐶' : '🐱'}</div>'">`
-        : `<div class="card__img-placeholder">${p.mascota === 'perro' ? '🐶' : '🐱'}</div>`;
+    function escHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 
+    // ── Render tarjeta ───────────────────────────────────────
+    function renderTarjeta(p) {
+      const emoji      = p.mascota === 'perro' ? '🐶' : '🐱';
       const badgeLabel = p.mascota === 'perro' ? '🐶 Perro' : '🐱 Gato';
+
+      const imgHtml = p.imagen
+        ? `<img class="card__img" src="${escHtml(p.imagen)}" alt="${escHtml(p.nombre)}"
+                onerror="this.outerHTML='<div class=card__img-placeholder>${emoji}</div>'">`
+        : `<div class="card__img-placeholder">${emoji}</div>`;
+
+      const deleteBtnHtml = p.userAdded
+        ? `<button class="card__delete" onclick="eliminarProducto('${p.id}')"
+                   title="Eliminar producto" aria-label="Eliminar ${escHtml(p.nombre)}">✕</button>`
+        : '';
+
+      const infoExtra = [
+        p.tamano_bolso  ? `📦 Bolso de ${p.tamano_bolso} kg`    : null,
+        p.sabor         ? `🍖 Sabor: ${escHtml(p.sabor)}`       : null,
+        p.tamano        ? `🐾 ${escHtml(p.tamano)}`              : null,
+        p.ingredientes  ? `🌿 ${escHtml(p.ingredientes)}`        : null,
+      ].filter(Boolean);
 
       return `
         <article class="card" data-mascota="${p.mascota}">
           <div class="card__image-wrap">
             ${imgHtml}
             <span class="card__badge card__badge--${p.mascota}">${badgeLabel}</span>
+            ${deleteBtnHtml}
           </div>
           <div class="card__body">
-            <p class="card__brand">${p.marca}</p>
-            <h2 class="card__name">${p.nombre}</h2>
+            <p class="card__brand">${escHtml(p.marca)}</p>
+            <h2 class="card__name">${escHtml(p.nombre)}</h2>
             <p class="card__price">
               ${formatoPrecio(p.precio_kg)}<span class="card__price-unit"> /kg</span>
             </p>
-
             <div class="card__nutri">
               <div class="nutri-row">
                 <span class="nutri-label">Proteína</span>
-                <span class="nutri-value">${p.proteina}%</span>
+                <span class="nutri-value">${p.proteina ?? 0}%</span>
                 ${renderBarra(p.proteina, 'proteina')}
               </div>
               <div class="nutri-row">
                 <span class="nutri-label">Grasa</span>
-                <span class="nutri-value">${p.grasa}%</span>
+                <span class="nutri-value">${p.grasa ?? 0}%</span>
                 ${renderBarra(p.grasa, 'grasa')}
               </div>
               <div class="nutri-row">
                 <span class="nutri-label">Humedad</span>
-                <span class="nutri-value">${p.humedad}%</span>
+                <span class="nutri-value">${p.humedad ?? 0}%</span>
                 ${renderBarra(p.humedad, 'humedad')}
               </div>
             </div>
-
+            ${infoExtra.length ? `
             <div class="card__info">
-              <p class="card__info-row">📦 ${p.tamano}</p>
-              <p class="card__info-row">🌿 ${p.ingredientes}</p>
-            </div>
-
+              ${infoExtra.map(r => `<p class="card__info-row">${r}</p>`).join('')}
+            </div>` : ''}
             <div class="card__stars" aria-label="${p.estrellas} de 5 estrellas">
               ${renderEstrellas(p.estrellas)}
             </div>
@@ -147,14 +286,15 @@
         </article>`;
     }
 
+    // ── Mostrar productos ────────────────────────────────────
     function mostrarProductos(filtro) {
-      const grid       = document.getElementById('productsGrid');
-      const vacio      = document.getElementById('emptyState');
-      const contador   = document.getElementById('resultsCount');
+      filtroActual = filtro;
+      const todos  = [...PRODUCTOS, ...productosUsuario];
+      const lista  = filtro === 'todos' ? todos : todos.filter(p => p.mascota === filtro);
 
-      const lista = filtro === 'todos'
-        ? PRODUCTOS
-        : PRODUCTOS.filter(p => p.mascota === filtro);
+      const grid    = document.getElementById('productsGrid');
+      const vacio   = document.getElementById('emptyState');
+      const contador = document.getElementById('resultsCount');
 
       if (lista.length === 0) {
         grid.innerHTML = '';
@@ -168,17 +308,86 @@
       }
     }
 
-    // Filtros — click en los botones
+    // ── Eliminar producto ────────────────────────────────────
+    function eliminarProducto(id) {
+      if (!confirm('¿Eliminar este producto?')) return;
+      productosUsuario = productosUsuario.filter(p => p.id !== id);
+      guardarUsuario();
+      mostrarProductos(filtroActual);
+    }
+
+    // ── Formulario ───────────────────────────────────────────
+    function abrirFormulario() {
+      document.getElementById('productoModal').style.display = 'flex';
+      document.getElementById('f-marca').focus();
+    }
+
+    function cerrarFormulario() {
+      document.getElementById('productoModal').style.display = 'none';
+      document.getElementById('productoForm').reset();
+      document.getElementById('imgPreview').innerHTML = '';
+    }
+
+    function agregarProducto(e) {
+      e.preventDefault();
+      const f = e.target;
+
+      const nuevo = {
+        id:           Date.now().toString(),
+        userAdded:    true,
+        mascota:      f.mascota.value,
+        imagen:       f.imagen.value.trim(),
+        marca:        f.marca.value.trim(),
+        nombre:       f.nombre.value.trim(),
+        precio_kg:    parseFloat(f.precio_kg.value) || 0,
+        proteina:     parseFloat(f.proteina.value)  || 0,
+        grasa:        parseFloat(f.grasa.value)     || 0,
+        humedad:      parseFloat(f.humedad.value)   || 0,
+        sabor:        f.sabor.value.trim(),
+        tamano_bolso: parseFloat(f.tamano_bolso.value) || null,
+        tamano:       f.tamano.value.trim(),
+        estrellas:    parseInt(f.estrellas.value)   || 5,
+        ingredientes: '',
+      };
+
+      productosUsuario.push(nuevo);
+      guardarUsuario();
+      cerrarFormulario();
+      mostrarProductos(filtroActual);
+
+      // Scroll al nuevo producto
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.card');
+        if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+
+    // Preview de imagen al escribir URL
+    document.getElementById('f-imagen').addEventListener('input', function() {
+      const preview = document.getElementById('imgPreview');
+      if (this.value.trim()) {
+        preview.innerHTML = `<img src="${escHtml(this.value.trim())}" alt="Preview"
+          onerror="this.parentElement.innerHTML='<span class=preview-error>No se pudo cargar la imagen</span>'">`;
+      } else {
+        preview.innerHTML = '';
+      }
+    });
+
+    // Cerrar modal al hacer click fuera
+    document.getElementById('productoModal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarFormulario();
+    });
+
+    // ── Filtros ──────────────────────────────────────────────
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn')
-                .forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         mostrarProductos(btn.dataset.filter);
       });
     });
 
-    // Render inicial
+    // ── Render inicial ───────────────────────────────────────
     mostrarProductos('todos');
   </script>
 
