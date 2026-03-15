@@ -333,27 +333,30 @@ body {
   color: var(--color-primary);
 }
 
-/* ── Header actions (botón admin) ────────────────────────── */
-.header__actions {
-  margin-left: auto;
-}
-
-.admin-login-btn {
-  padding: 8px 18px;
-  border: 2px solid var(--color-primary);
-  border-radius: 100px;
-  background: rgba(63,180,152,0.15);
-  color: var(--color-primary);
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.18s;
-  letter-spacing: 0.03em;
-}
-
-.admin-login-btn:hover {
+/* ── Botón admin flotante (FAB) ──────────────────────────── */
+.admin-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 900;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   background: var(--color-primary);
   color: var(--color-white);
+  font-size: 1.4rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(63,180,152,0.45);
+  transition: transform 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(63,180,152,0.6);
 }
 
 /* ── Barra modo admin ────────────────────────────────────── */
