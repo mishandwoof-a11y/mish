@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mish&amp;woof · Comparador de Balanceados</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ── ENCABEZADO ───────────────────────────────────────── -->
+  <header class="header">
+    <div class="header__inner">
+      <div class="header__logo">
+        <div class="logo-text">
+          <span class="logo-main">mish<span class="logo-amp">&amp;</span>woof</span>
+          <span class="logo-sub">PET SHOP</span>
+        </div>
+      </div>
+      <div class="header__title">
+        <h1>Comparador de Balanceados</h1>
+        <p>Encontrá el alimento ideal para tu mascota</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ── FILTROS ────────────────────────────────────────── -->
+    <section class="filters" aria-label="Filtrar por mascota">
+      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn" data-filter="perro">🐶 Perros</button>
+      <button class="filter-btn" data-filter="gato">🐱 Gatos</button>
+    </section>
+
+    <!-- Contador de resultados -->
+    <p class="results-count" id="resultsCount"></p>
+
+    <!-- ── GRILLA DE TARJETAS ─────────────────────────────── -->
+    <!-- Las tarjetas se generan automáticamente desde products.js -->
+    <section class="grid" id="productsGrid" aria-live="polite"></section>
+
+    <!-- ── ESTADO VACÍO ───────────────────────────────────── -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <span class="empty-icon">🐾</span>
+      <p>No hay productos en esta categoría todavía.<br>
+         Agregá productos en el archivo <code>products.js</code></p>
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>Los precios son orientativos y pueden variar ·
+       <strong>mish &amp; woof Pet Shop</strong></p>
+  </footer>
+
+
+  <!-- Datos de productos (editá products.js para agregar productos) -->
+  <script src="products.js"></script>
+
+  <!-- ── LÓGICA DE RENDERIZADO ──────────────────────────────── -->
+  <script>
+    // Máximos de referencia para las barras nutricionales
+    // (ajustá si tus productos superan estos valores)
+    const MAXIMOS = { proteina: 50, grasa: 30, humedad: 20 };
+
+    function formatoPrecio(n) {
+      return '$' + Number(n).toLocaleString('es-AR');
+    }
+
+    function renderEstrellas(n) {
+      const llenas = Math.max(0, Math.min(5, Math.round(n)));
+      return '★'.repeat(llenas) + '☆'.repeat(5 - llenas);
+    }
+
+    function barraColor(campo) {
+      const colores = {
+        proteina: 'var(--color-primary)',
+        grasa:    '#f0a500',
+        humedad:  '#5ab4d6',
+      };
+      return colores[campo] || 'var(--color-primary)';
+    }
+
+    function renderBarra(valor, campo) {
+      const pct = Math.min((valor / MAXIMOS[campo]) * 100, 100).toFixed(1);
+      return `
+        <div class="nutri-bar">
+          <div class="nutri-fill"
+               style="width:${pct}%; background:${barraColor(campo)}">
+          </div>
+        </div>`;
+    }
+
+    function renderTarjeta(p) {
+      // Imagen o placeholder con emoji
+      const imgHtml = p.imagen
+        ? `<img class="card__img"
+                src="${p.imagen}"
+                alt="${p.nombre} – ${p.marca}"
+                onerror="this.outerHTML='<div class=card__img-placeholder>${p.mascota === 'perro' ? '🐶' : '🐱'}</div>'">`
+        : `<div class="card__img-placeholder">${p.mascota === 'perro' ? '🐶' : '🐱'}</div>`;
+
+      const badgeLabel = p.mascota === 'perro' ? '🐶 Perro' : '🐱 Gato';
+
+      return `
+        <article class="card" data-mascota="${p.mascota}">
+          <div class="card__image-wrap">
+            ${imgHtml}
+            <span class="card__badge card__badge--${p.mascota}">${badgeLabel}</span>
+          </div>
+          <div class="card__body">
+            <p class="card__brand">${p.marca}</p>
+            <h2 class="card__name">${p.nombre}</h2>
+            <p class="card__price">
+              ${formatoPrecio(p.precio_kg)}<span class="card__price-unit"> /kg</span>
+            </p>
+
+            <div class="card__nutri">
+              <div class="nutri-row">
+                <span class="nutri-label">Proteína</span>
+                <span class="nutri-value">${p.proteina}%</span>
+                ${renderBarra(p.proteina, 'proteina')}
+              </div>
+              <div class="nutri-row">
+                <span class="nutri-label">Grasa</span>
+                <span class="nutri-value">${p.grasa}%</span>
+                ${renderBarra(p.grasa, 'grasa')}
+              </div>
+              <div class="nutri-row">
+                <span class="nutri-label">Humedad</span>
+                <span class="nutri-value">${p.humedad}%</span>
+                ${renderBarra(p.humedad, 'humedad')}
+              </div>
+            </div>
+
+            <div class="card__info">
+              <p class="card__info-row">📦 ${p.tamano}</p>
+              <p class="card__info-row">🌿 ${p.ingredientes}</p>
+            </div>
+
+            <div class="card__stars" aria-label="${p.estrellas} de 5 estrellas">
+              ${renderEstrellas(p.estrellas)}
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function mostrarProductos(filtro) {
+      const grid       = document.getElementById('productsGrid');
+      const vacio      = document.getElementById('emptyState');
+      const contador   = document.getElementById('resultsCount');
+
+      const lista = filtro === 'todos'
+        ? PRODUCTOS
+        : PRODUCTOS.filter(p => p.mascota === filtro);
+
+      if (lista.length === 0) {
+        grid.innerHTML = '';
+        vacio.style.display = 'block';
+        contador.textContent = '';
+      } else {
+        grid.innerHTML = lista.map(renderTarjeta).join('');
+        vacio.style.display = 'none';
+        const s = lista.length !== 1 ? 's' : '';
+        contador.textContent = `Mostrando ${lista.length} producto${s}`;
+      }
+    }
+
+    // Filtros — click en los botones
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn')
+                .forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mostrarProductos(btn.dataset.filter);
+      });
+    });
+
+    // Render inicial
+    mostrarProductos('todos');
+  </script>
+
+</body>
+</html>

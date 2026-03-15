@@ -1,0 +1,350 @@
+/* ================================================================
+   mish & woof Pet Shop — Comparador de Balanceados
+   Estilos con colores institucionales (Manual de Marca)
+   ================================================================
+
+   ✏️  Para cambiar la paleta de colores editá solo esta sección:
+   ================================================================ */
+
+:root {
+  --color-primary:        #3FB498;  /* Pantone 3258C — RGB(63,180,152)  */
+  --color-dark:           #1D1D1B;  /* Pantone Black C — RGB(29,29,27)  */
+  --color-bg:             #E8EDF0;  /* Gris claro institucional         */
+  --color-primary-light:  #d4f2ea;  /* Tint claro del verde             */
+  --color-white:          #FFFFFF;
+  --color-text:           #2c2c2a;
+  --color-text-muted:     #6b7280;
+  --color-border:         #dce3e7;
+  --color-star:           #f0a500;
+
+  --radius-card:  18px;
+  --radius-sm:    10px;
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.09);
+  --shadow-hover: 0 8px 36px rgba(63,180,152,0.18);
+}
+
+/* ── Reset básico ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.header {
+  background: var(--color-dark);
+  padding: 28px 24px 24px;
+}
+
+.header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo-main {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--color-primary);
+  letter-spacing: -0.5px;
+}
+
+.logo-amp {
+  font-weight: 400;
+}
+
+.logo-sub {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--color-primary);
+  margin-top: 2px;
+}
+
+.header__title {
+  border-left: 2px solid rgba(63,180,152,0.35);
+  padding-left: 28px;
+}
+
+.header__title h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.header__title p {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.55);
+  margin-top: 4px;
+}
+
+/* ── Main ────────────────────────────────────────────────────── */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+  flex: 1;
+  width: 100%;
+}
+
+/* ── Filtros ─────────────────────────────────────────────────── */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 10px 22px;
+  border: 2px solid var(--color-border);
+  border-radius: 100px;
+  background: var(--color-white);
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.filter-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.filter-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* ── Contador de resultados ───────────────────────────────────── */
+.results-count {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+}
+
+/* ── Grilla ──────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ── Tarjeta ─────────────────────────────────────────────────── */
+.card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Imagen */
+.card__image-wrap {
+  position: relative;
+  height: 200px;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
+}
+
+.card__img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-bg) 100%);
+}
+
+/* Badge perro / gato */
+.card__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.card__badge--perro {
+  background: #fff3e0;
+  color: #b45309;
+}
+
+.card__badge--gato {
+  background: var(--color-primary-light);
+  color: #0d7a5c;
+}
+
+/* Cuerpo de la tarjeta */
+.card__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.card__brand {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.card__name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  line-height: 1.3;
+}
+
+/* Precio */
+.card__price {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--color-dark);
+}
+
+.card__price-unit {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* Barras nutricionales */
+.card__nutri {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nutri-row {
+  display: grid;
+  grid-template-columns: 70px 36px 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.nutri-label {
+  color: var(--color-text-muted);
+}
+
+.nutri-value {
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.nutri-bar {
+  height: 7px;
+  background: var(--color-bg);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.nutri-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+/* Info extra */
+.card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+.card__info-row {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Estrellas */
+.card__stars {
+  font-size: 1.1rem;
+  color: var(--color-star);
+  letter-spacing: 2px;
+  margin-top: auto;
+}
+
+/* ── Estado vacío ────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--color-text-muted);
+}
+
+.empty-icon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.footer {
+  background: var(--color-dark);
+  text-align: center;
+  padding: 18px 20px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.footer strong {
+  color: var(--color-primary);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .header__title {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .logo-main {
+    font-size: 2rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
