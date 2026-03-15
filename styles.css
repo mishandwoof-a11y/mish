@@ -340,20 +340,20 @@ body {
 
 .admin-login-btn {
   padding: 8px 18px;
-  border: 2px solid rgba(63,180,152,0.4);
+  border: 2px solid var(--color-primary);
   border-radius: 100px;
-  background: transparent;
-  color: rgba(255,255,255,0.65);
-  font-size: 0.82rem;
-  font-weight: 600;
+  background: rgba(63,180,152,0.15);
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.18s;
   letter-spacing: 0.03em;
 }
 
 .admin-login-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-white);
 }
 
 /* ── Barra modo admin ────────────────────────────────────── */
