@@ -333,325 +333,226 @@ body {
   color: var(--color-primary);
 }
 
-/* ── Botón admin flotante (FAB) ──────────────────────────── */
-.admin-fab {
+/* ── Botón flotante agregar (FAB) ────────────────────────── */
+.fab {
   position: fixed;
   bottom: 28px;
   right: 28px;
   z-index: 900;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--color-primary);
   color: var(--color-white);
-  font-size: 1.4rem;
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(63,180,152,0.45);
+  box-shadow: 0 4px 18px rgba(63,180,152,0.5);
   transition: transform 0.18s, box-shadow 0.18s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.admin-fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 24px rgba(63,180,152,0.6);
+.fab:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 6px 28px rgba(63,180,152,0.65);
 }
 
-/* ── Barra modo admin ────────────────────────────────────── */
-.admin-bar {
+/* ── Modal agregar producto ──────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.modal__box {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  overflow: hidden;
+  margin: auto;
+}
+
+.modal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  background: #1a4a3e;
-  border-bottom: 2px solid var(--color-primary);
-  padding: 10px 24px;
-  font-size: 0.83rem;
-  color: var(--color-primary);
-  font-weight: 600;
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.admin-bar__actions {
-  display: flex;
-  gap: 10px;
-}
-
-.admin-bar__btn {
-  padding: 6px 14px;
-  border-radius: 100px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 2px solid transparent;
-}
-
-.admin-bar__btn--logout {
-  background: var(--color-primary);
-  color: var(--color-white);
-  border-color: var(--color-primary);
-}
-
-.admin-bar__btn--logout:hover {
-  background: transparent;
-  color: var(--color-primary);
-}
-
-.admin-bar__btn--reset {
-  background: transparent;
-  color: rgba(255,255,255,0.55);
-  border-color: rgba(255,255,255,0.2);
-}
-
-.admin-bar__btn--reset:hover {
-  border-color: rgba(255,255,255,0.5);
-  color: var(--color-white);
-}
-
-/* ── Modal login ─────────────────────────────────────────── */
-.admin-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.admin-modal__box {
-  background: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 36px 32px 28px;
-  width: 100%;
-  max-width: 380px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.admin-modal__title {
-  font-size: 1.25rem;
+.modal__title {
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--color-dark);
 }
 
-.admin-modal__desc {
-  font-size: 0.875rem;
+.modal__close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
   color: var(--color-text-muted);
-  margin-top: -6px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
 }
 
-.admin-modal__input {
-  width: 100%;
-  padding: 11px 14px;
-  border: 2px solid var(--color-border);
+.modal__close:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── Formulario ──────────────────────────────────────────── */
+.product-form {
+  padding: 24px 28px 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-sm);
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-white);
   transition: border-color 0.15s;
   outline: none;
+  width: 100%;
 }
 
-.admin-modal__input:focus {
+.form-input:focus {
   border-color: var(--color-primary);
 }
 
-.admin-modal__error {
-  font-size: 0.8rem;
-  color: #dc2626;
-  min-height: 1em;
-  margin-top: -6px;
+.form-select {
+  cursor: pointer;
 }
 
-.admin-modal__actions {
+/* Preview imagen */
+.form-img-preview {
+  margin-top: 6px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  max-height: 120px;
+}
+
+.form-img-preview img {
+  width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  background: var(--color-bg);
+  display: block;
+}
+
+.preview-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+}
+
+/* Botones del form */
+.form-actions {
+  grid-column: 1 / -1;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
   margin-top: 4px;
 }
 
-.admin-modal__btn {
-  padding: 9px 20px;
+.btn {
+  padding: 10px 24px;
   border-radius: 100px;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
   border: 2px solid transparent;
+  transition: all 0.15s;
 }
 
-.admin-modal__btn--login {
+.btn--primary {
   background: var(--color-primary);
   color: var(--color-white);
   border-color: var(--color-primary);
 }
 
-.admin-modal__btn--login:hover {
+.btn--primary:hover {
   background: #33a085;
   border-color: #33a085;
 }
 
-.admin-modal__btn--cancel {
+.btn--secondary {
   background: transparent;
   color: var(--color-text-muted);
   border-color: var(--color-border);
 }
 
-.admin-modal__btn--cancel:hover {
+.btn--secondary:hover {
   border-color: var(--color-text-muted);
   color: var(--color-text);
 }
 
-/* ── Tarjeta en modo admin ───────────────────────────────── */
-.card--admin {
-  outline: 2px dashed rgba(63,180,152,0.45);
-  outline-offset: -2px;
-}
-
-.card--admin:hover {
-  outline-color: var(--color-primary);
-}
-
-/* URL de imagen */
-.admin-img-url {
-  padding: 8px 12px;
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Etiquetas de campo */
-.admin-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-}
-
-/* Input genérico de admin */
-.admin-input {
-  width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-bg);
-  color: var(--color-text);
-  padding: 5px 8px;
-  font-family: inherit;
-  font-size: 0.875rem;
-  transition: border-color 0.15s, background 0.15s;
-  outline: none;
-}
-
-.admin-input:focus {
-  border-color: var(--color-primary);
-  background: var(--color-white);
-}
-
-.admin-input--brand {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-  background: transparent;
-  border-color: transparent;
-  border-bottom-color: var(--color-border);
-  border-radius: 0;
-  padding: 3px 4px;
-}
-
-.admin-input--brand:focus {
-  background: var(--color-bg);
-  border-color: var(--color-primary);
-  border-radius: 6px;
-}
-
-.admin-input--name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--color-dark);
-  background: transparent;
-  border-color: transparent;
-  border-bottom-color: var(--color-border);
-  border-radius: 0;
-  padding: 3px 4px;
-}
-
-.admin-input--name:focus {
-  background: var(--color-bg);
-  border-color: var(--color-primary);
-  border-radius: 6px;
-}
-
-/* Fila precio */
-.admin-price-row {
+/* ── Botón eliminar en tarjetas ──────────────────────────── */
+.card__delete {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.85);
+  color: white;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  line-height: 1;
 }
 
-.price-display {
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--color-dark);
-  min-width: 90px;
+.card:hover .card__delete {
+  opacity: 1;
 }
 
-.admin-input--number {
-  width: 80px;
-  text-align: right;
-  font-weight: 700;
-}
-
-/* Inputs nutricionales */
-.admin-input--nutri {
-  width: 52px;
-  text-align: right;
-  font-weight: 700;
-  font-size: 0.8rem;
-  padding: 2px 5px;
-}
-
-/* Info editable */
-.admin-info {
-  border-top: 1px solid var(--color-border);
-  padding-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.admin-field-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.admin-input--textarea {
-  resize: vertical;
-  line-height: 1.4;
-  min-height: 48px;
-}
-
-/* Fila estrellas */
-.admin-stars-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: auto;
-}
-
-.admin-input--stars {
-  width: 54px;
+.card__delete:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
@@ -669,8 +570,21 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .admin-bar {
-    flex-direction: column;
-    align-items: flex-start;
+  .product-form {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .form-group--full {
+    grid-column: 1;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
   }
 }
