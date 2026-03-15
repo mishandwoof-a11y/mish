@@ -333,6 +333,324 @@ body {
   color: var(--color-primary);
 }
 
+/* ── Header actions (botón admin) ────────────────────────── */
+.header__actions {
+  margin-left: auto;
+}
+
+.admin-login-btn {
+  padding: 8px 18px;
+  border: 2px solid rgba(63,180,152,0.4);
+  border-radius: 100px;
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  letter-spacing: 0.03em;
+}
+
+.admin-login-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Barra modo admin ────────────────────────────────────── */
+.admin-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #1a4a3e;
+  border-bottom: 2px solid var(--color-primary);
+  padding: 10px 24px;
+  font-size: 0.83rem;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.admin-bar__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-bar__btn {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+}
+
+.admin-bar__btn--logout {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.admin-bar__btn--logout:hover {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.admin-bar__btn--reset {
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.admin-bar__btn--reset:hover {
+  border-color: rgba(255,255,255,0.5);
+  color: var(--color-white);
+}
+
+/* ── Modal login ─────────────────────────────────────────── */
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.admin-modal__box {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-modal__title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-dark);
+}
+
+.admin-modal__desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: -6px;
+}
+
+.admin-modal__input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.admin-modal__input:focus {
+  border-color: var(--color-primary);
+}
+
+.admin-modal__error {
+  font-size: 0.8rem;
+  color: #dc2626;
+  min-height: 1em;
+  margin-top: -6px;
+}
+
+.admin-modal__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.admin-modal__btn {
+  padding: 9px 20px;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+}
+
+.admin-modal__btn--login {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.admin-modal__btn--login:hover {
+  background: #33a085;
+  border-color: #33a085;
+}
+
+.admin-modal__btn--cancel {
+  background: transparent;
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.admin-modal__btn--cancel:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+/* ── Tarjeta en modo admin ───────────────────────────────── */
+.card--admin {
+  outline: 2px dashed rgba(63,180,152,0.45);
+  outline-offset: -2px;
+}
+
+.card--admin:hover {
+  outline-color: var(--color-primary);
+}
+
+/* URL de imagen */
+.admin-img-url {
+  padding: 8px 12px;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Etiquetas de campo */
+.admin-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+/* Input genérico de admin */
+.admin-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  padding: 5px 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+  outline: none;
+}
+
+.admin-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+}
+
+.admin-input--brand {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: transparent;
+  border-color: transparent;
+  border-bottom-color: var(--color-border);
+  border-radius: 0;
+  padding: 3px 4px;
+}
+
+.admin-input--brand:focus {
+  background: var(--color-bg);
+  border-color: var(--color-primary);
+  border-radius: 6px;
+}
+
+.admin-input--name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  background: transparent;
+  border-color: transparent;
+  border-bottom-color: var(--color-border);
+  border-radius: 0;
+  padding: 3px 4px;
+}
+
+.admin-input--name:focus {
+  background: var(--color-bg);
+  border-color: var(--color-primary);
+  border-radius: 6px;
+}
+
+/* Fila precio */
+.admin-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-display {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-dark);
+  min-width: 90px;
+}
+
+.admin-input--number {
+  width: 80px;
+  text-align: right;
+  font-weight: 700;
+}
+
+/* Inputs nutricionales */
+.admin-input--nutri {
+  width: 52px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 2px 5px;
+}
+
+/* Info editable */
+.admin-info {
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-input--textarea {
+  resize: vertical;
+  line-height: 1.4;
+  min-height: 48px;
+}
+
+/* Fila estrellas */
+.admin-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.admin-input--stars {
+  width: 54px;
+}
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 520px) {
   .header__title {
@@ -346,5 +664,10 @@ body {
 
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-bar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

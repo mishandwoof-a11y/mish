@@ -21,8 +21,47 @@
         <h1>Comparador de Balanceados</h1>
         <p>Encontrá el alimento ideal para tu mascota</p>
       </div>
+      <div class="header__actions">
+        <button class="admin-login-btn" id="adminLoginBtn" onclick="abrirModal()">
+          ⚙️ Admin
+        </button>
+      </div>
     </div>
   </header>
+
+  <!-- ── BARRA MODO ADMIN ──────────────────────────────────── -->
+  <div class="admin-bar" id="adminBar" style="display:none;" role="alert">
+    <span class="admin-bar__status">⚙️ Modo Admin — los cambios se guardan automáticamente</span>
+    <div class="admin-bar__actions">
+      <button class="admin-bar__btn admin-bar__btn--reset" id="resetDataBtn" onclick="restaurarOriginales()">
+        ↺ Restaurar originales
+      </button>
+      <button class="admin-bar__btn admin-bar__btn--logout" onclick="cerrarSesion()">
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+
+  <!-- ── MODAL LOGIN ───────────────────────────────────────── -->
+  <div class="admin-modal" id="adminModal" style="display:none;"
+       role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="admin-modal__box">
+      <h2 class="admin-modal__title" id="modalTitle">Acceso Administrador</h2>
+      <p class="admin-modal__desc">Ingresá la contraseña para editar los productos.</p>
+      <input type="password" id="adminPassInput" class="admin-modal__input"
+             placeholder="Contraseña" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') confirmarLogin()">
+      <p class="admin-modal__error" id="adminLoginError"></p>
+      <div class="admin-modal__actions">
+        <button class="admin-modal__btn admin-modal__btn--cancel" onclick="cerrarModal()">
+          Cancelar
+        </button>
+        <button class="admin-modal__btn admin-modal__btn--login" onclick="confirmarLogin()">
+          Ingresar
+        </button>
+      </div>
+    </div>
+  </div>
 
   <main class="main">
 
@@ -37,7 +76,6 @@
     <p class="results-count" id="resultsCount"></p>
 
     <!-- ── GRILLA DE TARJETAS ─────────────────────────────── -->
-    <!-- Las tarjetas se generan automáticamente desde products.js -->
     <section class="grid" id="productsGrid" aria-live="polite"></section>
 
     <!-- ── ESTADO VACÍO ───────────────────────────────────── -->
@@ -55,16 +93,36 @@
        <strong>mish &amp; woof Pet Shop</strong></p>
   </footer>
 
-
-  <!-- Datos de productos (editá products.js para agregar productos) -->
+  <!-- Datos de productos base -->
   <script src="products.js"></script>
 
-  <!-- ── LÓGICA DE RENDERIZADO ──────────────────────────────── -->
+  <!-- ── LÓGICA PRINCIPAL ───────────────────────────────────── -->
   <script>
-    // Máximos de referencia para las barras nutricionales
-    // (ajustá si tus productos superan estos valores)
+    // ── Constantes ──────────────────────────────────────────
     const MAXIMOS = { proteina: 50, grasa: 30, humedad: 20 };
+    const ADMIN_PASSWORD = 'admin123';
+    const LS_KEY = 'mishwoof_productos';
 
+    // ── Estado ──────────────────────────────────────────────
+    let adminMode = false;
+    let filtroActual = 'todos';
+
+    // Carga productos desde localStorage o usa los originales
+    let productosData = cargarProductos();
+
+    function cargarProductos() {
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+      return JSON.parse(JSON.stringify(PRODUCTOS));
+    }
+
+    function guardarProductos() {
+      localStorage.setItem(LS_KEY, JSON.stringify(productosData));
+    }
+
+    // ── Helpers visuales ────────────────────────────────────
     function formatoPrecio(n) {
       return '$' + Number(n).toLocaleString('es-AR');
     }
@@ -75,30 +133,30 @@
     }
 
     function barraColor(campo) {
-      const colores = {
-        proteina: 'var(--color-primary)',
-        grasa:    '#f0a500',
-        humedad:  '#5ab4d6',
-      };
-      return colores[campo] || 'var(--color-primary)';
+      return { proteina: 'var(--color-primary)', grasa: '#f0a500', humedad: '#5ab4d6' }[campo]
+             || 'var(--color-primary)';
     }
 
-    function renderBarra(valor, campo) {
+    function renderBarra(valor, campo, claseExtra) {
       const pct = Math.min((valor / MAXIMOS[campo]) * 100, 100).toFixed(1);
       return `
         <div class="nutri-bar">
-          <div class="nutri-fill"
+          <div class="nutri-fill ${claseExtra || ''}"
                style="width:${pct}%; background:${barraColor(campo)}">
           </div>
         </div>`;
     }
 
+    function escHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ── Render modo visitante ────────────────────────────────
     function renderTarjeta(p) {
-      // Imagen o placeholder con emoji
       const imgHtml = p.imagen
-        ? `<img class="card__img"
-                src="${p.imagen}"
-                alt="${p.nombre} – ${p.marca}"
+        ? `<img class="card__img" src="${escHtml(p.imagen)}" alt="${escHtml(p.nombre)} – ${escHtml(p.marca)}"
                 onerror="this.outerHTML='<div class=card__img-placeholder>${p.mascota === 'perro' ? '🐶' : '🐱'}</div>'">`
         : `<div class="card__img-placeholder">${p.mascota === 'perro' ? '🐶' : '🐱'}</div>`;
 
@@ -111,12 +169,11 @@
             <span class="card__badge card__badge--${p.mascota}">${badgeLabel}</span>
           </div>
           <div class="card__body">
-            <p class="card__brand">${p.marca}</p>
-            <h2 class="card__name">${p.nombre}</h2>
+            <p class="card__brand">${escHtml(p.marca)}</p>
+            <h2 class="card__name">${escHtml(p.nombre)}</h2>
             <p class="card__price">
               ${formatoPrecio(p.precio_kg)}<span class="card__price-unit"> /kg</span>
             </p>
-
             <div class="card__nutri">
               <div class="nutri-row">
                 <span class="nutri-label">Proteína</span>
@@ -134,12 +191,10 @@
                 ${renderBarra(p.humedad, 'humedad')}
               </div>
             </div>
-
             <div class="card__info">
-              <p class="card__info-row">📦 ${p.tamano}</p>
-              <p class="card__info-row">🌿 ${p.ingredientes}</p>
+              <p class="card__info-row">📦 ${escHtml(p.tamano)}</p>
+              <p class="card__info-row">🌿 ${escHtml(p.ingredientes)}</p>
             </div>
-
             <div class="card__stars" aria-label="${p.estrellas} de 5 estrellas">
               ${renderEstrellas(p.estrellas)}
             </div>
@@ -147,38 +202,235 @@
         </article>`;
     }
 
-    function mostrarProductos(filtro) {
-      const grid       = document.getElementById('productsGrid');
-      const vacio      = document.getElementById('emptyState');
-      const contador   = document.getElementById('resultsCount');
+    // ── Render modo admin ────────────────────────────────────
+    function renderTarjetaAdmin(p, idx) {
+      const mascotaEmoji = p.mascota === 'perro' ? '🐶' : '🐱';
+      const badgeLabel   = p.mascota === 'perro' ? '🐶 Perro' : '🐱 Gato';
 
-      const lista = filtro === 'todos'
-        ? PRODUCTOS
-        : PRODUCTOS.filter(p => p.mascota === filtro);
+      const imgHtml = p.imagen
+        ? `<img class="card__img" src="${escHtml(p.imagen)}" alt="${escHtml(p.nombre)}"
+                onerror="this.outerHTML='<div class=card__img-placeholder>${mascotaEmoji}</div>'">`
+        : `<div class="card__img-placeholder">${mascotaEmoji}</div>`;
+
+      return `
+        <article class="card card--admin" data-mascota="${p.mascota}" data-index="${idx}">
+          <div class="card__image-wrap">
+            ${imgHtml}
+            <span class="card__badge card__badge--${p.mascota}">${badgeLabel}</span>
+          </div>
+
+          <div class="admin-img-url">
+            <label class="admin-label">Imagen (URL o ruta)</label>
+            <input class="admin-input" type="text" data-field="imagen"
+                   value="${escHtml(p.imagen || '')}" placeholder="https://...">
+          </div>
+
+          <div class="card__body">
+            <input class="admin-input admin-input--brand" data-field="marca"
+                   value="${escHtml(p.marca)}" placeholder="Marca">
+            <input class="admin-input admin-input--name" data-field="nombre"
+                   value="${escHtml(p.nombre)}" placeholder="Nombre del producto">
+
+            <div class="admin-price-row">
+              <span class="admin-label">$/kg</span>
+              <span class="price-display">${formatoPrecio(p.precio_kg)}</span>
+              <input class="admin-input admin-input--number" type="number"
+                     data-field="precio_kg" value="${p.precio_kg}" min="0">
+            </div>
+
+            <div class="card__nutri">
+              ${['proteina','grasa','humedad'].map(campo => `
+                <div class="nutri-row">
+                  <span class="nutri-label">${campo.charAt(0).toUpperCase() + campo.slice(1)}</span>
+                  <input class="admin-input admin-input--nutri" type="number"
+                         data-field="${campo}" value="${p[campo]}" min="0" max="100">
+                  ${renderBarra(p[campo], campo, `nutri-fill--${campo}`)}
+                </div>`).join('')}
+            </div>
+
+            <div class="card__info admin-info">
+              <div class="admin-field-wrap">
+                <label class="admin-label">📦 Tamaño / raza</label>
+                <input class="admin-input" data-field="tamano"
+                       value="${escHtml(p.tamano)}" placeholder="Ej: Razas medianas">
+              </div>
+              <div class="admin-field-wrap">
+                <label class="admin-label">🌿 Ingredientes</label>
+                <textarea class="admin-input admin-input--textarea"
+                          data-field="ingredientes" rows="2">${escHtml(p.ingredientes)}</textarea>
+              </div>
+            </div>
+
+            <div class="admin-stars-row">
+              <label class="admin-label">Estrellas (1–5)</label>
+              <input class="admin-input admin-input--number admin-input--stars" type="number"
+                     data-field="estrellas" value="${p.estrellas}" min="1" max="5">
+              <span class="card__stars stars-display">${renderEstrellas(p.estrellas)}</span>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    // ── Actualizar displays derivados sin re-renderizar ──────
+    function actualizarDisplay(card, idx, field, value) {
+      if (field === 'imagen') {
+        const wrap = card.querySelector('.card__image-wrap');
+        const badge = wrap.querySelector('.card__badge');
+        const oldImg = wrap.querySelector('.card__img');
+        const oldPlaceholder = wrap.querySelector('.card__img-placeholder');
+        if (value) {
+          if (oldImg) {
+            oldImg.src = value;
+          } else {
+            const img = document.createElement('img');
+            img.className = 'card__img';
+            img.src = value;
+            img.alt = productosData[idx].nombre;
+            img.onerror = function() {
+              const em = productosData[idx].mascota === 'perro' ? '🐶' : '🐱';
+              this.outerHTML = `<div class="card__img-placeholder">${em}</div>`;
+            };
+            wrap.insertBefore(img, badge);
+            if (oldPlaceholder) oldPlaceholder.remove();
+          }
+        } else {
+          if (oldImg) oldImg.remove();
+          if (!wrap.querySelector('.card__img-placeholder')) {
+            const em = productosData[idx].mascota === 'perro' ? '🐶' : '🐱';
+            const ph = document.createElement('div');
+            ph.className = 'card__img-placeholder';
+            ph.textContent = em;
+            wrap.insertBefore(ph, badge);
+          }
+        }
+        return;
+      }
+
+      if (field === 'precio_kg') {
+        const pd = card.querySelector('.price-display');
+        if (pd) pd.textContent = formatoPrecio(value);
+        return;
+      }
+
+      if (['proteina', 'grasa', 'humedad'].includes(field)) {
+        const fill = card.querySelector(`.nutri-fill--${field}`);
+        if (fill) {
+          const pct = Math.min((value / MAXIMOS[field]) * 100, 100).toFixed(1);
+          fill.style.width = pct + '%';
+        }
+        return;
+      }
+
+      if (field === 'estrellas') {
+        const sd = card.querySelector('.stars-display');
+        if (sd) sd.textContent = renderEstrellas(value);
+        return;
+      }
+    }
+
+    // ── Render principal ─────────────────────────────────────
+    function mostrarProductos(filtro) {
+      filtroActual = filtro;
+      const grid    = document.getElementById('productsGrid');
+      const vacio   = document.getElementById('emptyState');
+      const contador = document.getElementById('resultsCount');
+
+      const lista = productosData
+        .map((p, i) => ({ p, i }))
+        .filter(({ p }) => filtro === 'todos' || p.mascota === filtro);
 
       if (lista.length === 0) {
         grid.innerHTML = '';
         vacio.style.display = 'block';
         contador.textContent = '';
       } else {
-        grid.innerHTML = lista.map(renderTarjeta).join('');
+        grid.innerHTML = lista.map(({ p, i }) =>
+          adminMode ? renderTarjetaAdmin(p, i) : renderTarjeta(p)
+        ).join('');
         vacio.style.display = 'none';
         const s = lista.length !== 1 ? 's' : '';
         contador.textContent = `Mostrando ${lista.length} producto${s}`;
       }
     }
 
-    // Filtros — click en los botones
+    // ── Edición en tiempo real (delegación de eventos) ───────
+    document.getElementById('productsGrid').addEventListener('input', function(e) {
+      if (!adminMode) return;
+      const input = e.target;
+      const field = input.dataset.field;
+      if (!field) return;
+      const card = input.closest('[data-index]');
+      if (!card) return;
+      const idx = parseInt(card.dataset.index);
+
+      const numericFields = ['precio_kg', 'proteina', 'grasa', 'humedad', 'estrellas'];
+      const value = numericFields.includes(field)
+        ? (parseFloat(input.value) || 0)
+        : input.value;
+
+      productosData[idx][field] = value;
+      guardarProductos();
+      actualizarDisplay(card, idx, field, value);
+    });
+
+    // ── Filtros ──────────────────────────────────────────────
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn')
-                .forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         mostrarProductos(btn.dataset.filter);
       });
     });
 
-    // Render inicial
+    // ── Admin: modal ─────────────────────────────────────────
+    function abrirModal() {
+      document.getElementById('adminModal').style.display = 'flex';
+      document.getElementById('adminPassInput').focus();
+    }
+
+    function cerrarModal() {
+      document.getElementById('adminModal').style.display = 'none';
+      document.getElementById('adminPassInput').value = '';
+      document.getElementById('adminLoginError').textContent = '';
+    }
+
+    function confirmarLogin() {
+      const pass = document.getElementById('adminPassInput').value;
+      if (pass === ADMIN_PASSWORD) {
+        adminMode = true;
+        document.getElementById('adminBar').style.display = 'flex';
+        document.getElementById('adminLoginBtn').style.display = 'none';
+        cerrarModal();
+        mostrarProductos(filtroActual);
+      } else {
+        const err = document.getElementById('adminLoginError');
+        err.textContent = 'Contraseña incorrecta.';
+        document.getElementById('adminPassInput').select();
+      }
+    }
+
+    // ── Admin: cerrar sesión ─────────────────────────────────
+    function cerrarSesion() {
+      adminMode = false;
+      document.getElementById('adminBar').style.display = 'none';
+      document.getElementById('adminLoginBtn').style.display = 'block';
+      mostrarProductos(filtroActual);
+    }
+
+    // ── Admin: restaurar datos originales ────────────────────
+    function restaurarOriginales() {
+      if (!confirm('¿Restaurar todos los productos a los valores originales? Se perderán los cambios guardados.')) return;
+      localStorage.removeItem(LS_KEY);
+      productosData = JSON.parse(JSON.stringify(PRODUCTOS));
+      mostrarProductos(filtroActual);
+    }
+
+    // Cerrar modal al hacer click fuera del box
+    document.getElementById('adminModal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal();
+    });
+
+    // ── Render inicial ───────────────────────────────────────
     mostrarProductos('todos');
   </script>
 
