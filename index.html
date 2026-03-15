@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>mish&amp;woof · Comparador de Balanceados</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -49,6 +50,13 @@
     <p>Los precios son orientativos y pueden variar ·
        <strong>mish &amp; woof Pet Shop</strong></p>
   </footer>
+
+  <!-- ── BARRA FLOTANTE DE SELECCIÓN ──────────────────────── -->
+  <div class="compare-bar" id="compareBar" style="display:none;" role="status">
+    <span class="compare-bar__icon">⚖</span>
+    <span id="compareBarText">1 de 2 seleccionado — elegí otro producto para comparar</span>
+    <button class="compare-bar__cancel" onclick="limpiarComparacion()">✕ Cancelar</button>
+  </div>
 
   <!-- ── BOTÓN FLOTANTE AGREGAR ────────────────────────────── -->
   <button class="fab" id="fabBtn" onclick="abrirFormulario()" title="Agregar producto">
@@ -174,6 +182,18 @@
     </div>
   </div>
 
+  <!-- ── MODAL COMPARACIÓN ─────────────────────────────────── -->
+  <div class="modal" id="comparacionModal" style="display:none;"
+       role="dialog" aria-modal="true" aria-labelledby="compareTitleLabel">
+    <div class="modal__box modal__box--wide">
+      <div class="modal__header">
+        <h2 class="modal__title" id="compareTitleLabel">⚖ Comparar productos</h2>
+        <button class="modal__close" onclick="cerrarComparacion()" aria-label="Cerrar comparación">✕</button>
+      </div>
+      <div class="compare-body" id="compareBody"></div>
+    </div>
+  </div>
+
   <!-- Datos base de productos -->
   <script src="products.js"></script>
 
@@ -182,41 +202,41 @@
     const MAXIMOS = { proteina: 50, grasa: 30, humedad: 20 };
     const LS_KEY  = 'mishwoof_user_productos';
 
-    // ── Productos usuario (persistidos en localStorage) ──────
+    // ── Productos usuario ────────────────────────────────────
     function cargarUsuario() {
       try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
       catch (e) { return []; }
     }
-
     function guardarUsuario() {
       localStorage.setItem(LS_KEY, JSON.stringify(productosUsuario));
     }
 
     let productosUsuario = cargarUsuario();
-    let filtroActual = 'todos';
+    let filtroActual     = 'todos';
+
+    // ── Estado de comparación ────────────────────────────────
+    let comparacion    = [];   // 0, 1 o 2 productos seleccionados
+    let listaActual    = [];   // lista renderizada más reciente (con _cmpIdx)
+    let chartInstancia = null; // instancia Chart.js activa
 
     // ── Helpers ──────────────────────────────────────────────
     function formatoPrecio(n) {
       return '$' + Number(n).toLocaleString('es-AR');
     }
-
     function renderEstrellas(n) {
       const l = Math.max(0, Math.min(5, Math.round(n)));
       return '★'.repeat(l) + '☆'.repeat(5 - l);
     }
-
     function barraColor(campo) {
       return { proteina: 'var(--color-primary)', grasa: '#f0a500', humedad: '#5ab4d6' }[campo]
              || 'var(--color-primary)';
     }
-
     function renderBarra(valor, campo) {
       const pct = Math.min(((valor || 0) / MAXIMOS[campo]) * 100, 100).toFixed(1);
       return `<div class="nutri-bar">
                 <div class="nutri-fill" style="width:${pct}%;background:${barraColor(campo)}"></div>
               </div>`;
     }
-
     function escHtml(str) {
       return String(str ?? '')
         .replace(/&/g,'&amp;').replace(/</g,'&lt;')
@@ -239,14 +259,14 @@
         : '';
 
       const infoExtra = [
-        p.tamano_bolso  ? `📦 Bolso de ${p.tamano_bolso} kg`    : null,
-        p.sabor         ? `🍖 Sabor: ${escHtml(p.sabor)}`       : null,
-        p.tamano        ? `🐾 ${escHtml(p.tamano)}`              : null,
-        p.ingredientes  ? `🌿 ${escHtml(p.ingredientes)}`        : null,
+        p.tamano_bolso  ? `📦 Bolso de ${p.tamano_bolso} kg` : null,
+        p.sabor         ? `🍖 Sabor: ${escHtml(p.sabor)}`    : null,
+        p.tamano        ? `🐾 ${escHtml(p.tamano)}`           : null,
+        p.ingredientes  ? `🌿 ${escHtml(p.ingredientes)}`     : null,
       ].filter(Boolean);
 
       return `
-        <article class="card" data-mascota="${p.mascota}">
+        <article class="card" data-mascota="${p.mascota}" data-cmp-idx="${p._cmpIdx}">
           <div class="card__image-wrap">
             ${imgHtml}
             <span class="card__badge card__badge--${p.mascota}">${badgeLabel}</span>
@@ -282,6 +302,11 @@
             <div class="card__stars" aria-label="${p.estrellas} de 5 estrellas">
               ${renderEstrellas(p.estrellas)}
             </div>
+            <button class="card__compare-btn" data-cmp-idx="${p._cmpIdx}"
+                    onclick="toggleComparacion(${p._cmpIdx})"
+                    aria-label="Comparar ${escHtml(p.nombre)}">
+              ⚖ Comparar
+            </button>
           </div>
         </article>`;
     }
@@ -289,23 +314,268 @@
     // ── Mostrar productos ────────────────────────────────────
     function mostrarProductos(filtro) {
       filtroActual = filtro;
-      const todos  = [...PRODUCTOS, ...productosUsuario];
-      const lista  = filtro === 'todos' ? todos : todos.filter(p => p.mascota === filtro);
+      limpiarComparacion(false); // resetear selección sin cerrar modal si está abierto
+
+      const todos = [...PRODUCTOS, ...productosUsuario];
+      const lista = filtro === 'todos' ? todos : todos.filter(p => p.mascota === filtro);
+
+      // Asignar índice transitorio para comparación
+      listaActual = lista.map((p, i) => ({ ...p, _cmpIdx: i }));
 
       const grid    = document.getElementById('productsGrid');
       const vacio   = document.getElementById('emptyState');
       const contador = document.getElementById('resultsCount');
 
-      if (lista.length === 0) {
+      if (listaActual.length === 0) {
         grid.innerHTML = '';
         vacio.style.display = 'block';
         contador.textContent = '';
       } else {
-        grid.innerHTML = lista.map(renderTarjeta).join('');
+        grid.innerHTML = listaActual.map(renderTarjeta).join('');
         vacio.style.display = 'none';
-        const s = lista.length !== 1 ? 's' : '';
-        contador.textContent = `Mostrando ${lista.length} producto${s}`;
+        const s = listaActual.length !== 1 ? 's' : '';
+        contador.textContent = `Mostrando ${listaActual.length} producto${s}`;
       }
+    }
+
+    // ── Comparación: selección ───────────────────────────────
+    function toggleComparacion(idx) {
+      const producto = listaActual[idx];
+      if (!producto) return;
+
+      const yaSeleccionado = comparacion.findIndex(p => p._cmpIdx === idx);
+
+      if (yaSeleccionado !== -1) {
+        // Deseleccionar
+        comparacion.splice(yaSeleccionado, 1);
+        actualizarEstadoCard(idx, false);
+      } else {
+        if (comparacion.length >= 2) return; // ya hay 2, ignorar
+        comparacion.push(producto);
+        actualizarEstadoCard(idx, true);
+      }
+
+      actualizarBarraComparacion();
+
+      if (comparacion.length === 2) {
+        abrirComparacion();
+      }
+    }
+
+    function actualizarEstadoCard(idx, seleccionado) {
+      const card = document.querySelector(`.card[data-cmp-idx="${idx}"]`);
+      const btn  = document.querySelector(`.card__compare-btn[data-cmp-idx="${idx}"]`);
+      if (card) card.classList.toggle('card--selected', seleccionado);
+      if (btn)  btn.classList.toggle('card__compare-btn--active', seleccionado);
+    }
+
+    function actualizarBarraComparacion() {
+      const bar = document.getElementById('compareBar');
+      // Deshabilitar botones de no-seleccionados cuando hay 2
+      document.querySelectorAll('.card__compare-btn').forEach(btn => {
+        const idx = parseInt(btn.dataset.cmpIdx);
+        const estaSeleccionado = comparacion.some(p => p._cmpIdx === idx);
+        btn.disabled = comparacion.length === 2 && !estaSeleccionado;
+        btn.classList.toggle('card--compare-disabled', btn.disabled);
+      });
+
+      if (comparacion.length === 1) {
+        bar.style.display = 'flex';
+      } else {
+        bar.style.display = 'none';
+      }
+    }
+
+    function limpiarComparacion(cerrarPanel = true) {
+      comparacion.forEach(p => actualizarEstadoCard(p._cmpIdx, false));
+      comparacion = [];
+      document.querySelectorAll('.card__compare-btn').forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('card--compare-disabled');
+      });
+      document.getElementById('compareBar').style.display = 'none';
+      if (cerrarPanel) {
+        document.getElementById('comparacionModal').style.display = 'none';
+      }
+    }
+
+    // ── Comparación: panel ───────────────────────────────────
+    function abrirComparacion() {
+      const [p1, p2] = comparacion;
+      document.getElementById('compareBody').innerHTML = buildCompareHTML(p1, p2);
+      document.getElementById('comparacionModal').style.display = 'flex';
+      buildChart(p1, p2);
+    }
+
+    function cerrarComparacion() {
+      document.getElementById('comparacionModal').style.display = 'none';
+      limpiarComparacion(false);
+    }
+
+    function imgOrPlaceholder(p, size = 'large') {
+      const emoji = p.mascota === 'perro' ? '🐶' : '🐱';
+      if (p.imagen) {
+        return `<img class="cmp-product__img" src="${escHtml(p.imagen)}" alt="${escHtml(p.nombre)}"
+                     onerror="this.outerHTML='<div class=cmp-product__placeholder>${emoji}</div>'">`;
+      }
+      return `<div class="cmp-product__placeholder">${emoji}</div>`;
+    }
+
+    function buildCompareHTML(p1, p2) {
+      // Lógica de ganadores: campo → {winner: 1|2|null, lowerBetter: bool}
+      function ganador(v1, v2, lowerBetter = false) {
+        if (v1 == null || v2 == null || v1 === v2) return null;
+        return lowerBetter ? (v1 < v2 ? 1 : 2) : (v1 > v2 ? 1 : 2);
+      }
+
+      const corona = `<span class="winner-crown" title="Mejor valor">👑</span>`;
+
+      function celda(val, isWinner) {
+        return `<td class="${isWinner ? 'winner' : ''}">${val}${isWinner ? ' ' + corona : ''}</td>`;
+      }
+
+      const gPrecio    = ganador(p1.precio_kg, p2.precio_kg, true);
+      const gProteina  = ganador(p1.proteina,  p2.proteina);
+      const gGrasa     = ganador(p1.grasa,     p2.grasa, true);
+      const gEstrellas = ganador(p1.estrellas, p2.estrellas);
+
+      return `
+        <div class="cmp-products">
+          <div class="cmp-product cmp-product--1">
+            ${imgOrPlaceholder(p1)}
+            <p class="cmp-product__brand">${escHtml(p1.marca)}</p>
+            <h3 class="cmp-product__name">${escHtml(p1.nombre)}</h3>
+          </div>
+          <div class="cmp-vs">VS</div>
+          <div class="cmp-product cmp-product--2">
+            ${imgOrPlaceholder(p2)}
+            <p class="cmp-product__brand">${escHtml(p2.marca)}</p>
+            <h3 class="cmp-product__name">${escHtml(p2.nombre)}</h3>
+          </div>
+        </div>
+
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th class="th--p1">${escHtml(p1.nombre)}</th>
+                <th class="th--p2">${escHtml(p2.nombre)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="row-label">💰 Precio /kg</td>
+                ${celda(formatoPrecio(p1.precio_kg), gPrecio === 1)}
+                ${celda(formatoPrecio(p2.precio_kg), gPrecio === 2)}
+              </tr>
+              <tr>
+                <td class="row-label">🥩 Proteína</td>
+                ${celda((p1.proteina ?? 0) + '%', gProteina === 1)}
+                ${celda((p2.proteina ?? 0) + '%', gProteina === 2)}
+              </tr>
+              <tr>
+                <td class="row-label">🫒 Grasa</td>
+                ${celda((p1.grasa ?? 0) + '%', gGrasa === 1)}
+                ${celda((p2.grasa ?? 0) + '%', gGrasa === 2)}
+              </tr>
+              <tr>
+                <td class="row-label">💧 Humedad</td>
+                <td>${(p1.humedad ?? 0)}%</td>
+                <td>${(p2.humedad ?? 0)}%</td>
+              </tr>
+              <tr>
+                <td class="row-label">🍖 Sabor</td>
+                <td>${escHtml(p1.sabor || '—')}</td>
+                <td>${escHtml(p2.sabor || '—')}</td>
+              </tr>
+              <tr>
+                <td class="row-label">📦 Bolso</td>
+                <td>${p1.tamano_bolso ? p1.tamano_bolso + ' kg' : '—'}</td>
+                <td>${p2.tamano_bolso ? p2.tamano_bolso + ' kg' : '—'}</td>
+              </tr>
+              <tr>
+                <td class="row-label">🐾 Raza / Tamaño</td>
+                <td>${escHtml(p1.tamano || '—')}</td>
+                <td>${escHtml(p2.tamano || '—')}</td>
+              </tr>
+              <tr>
+                <td class="row-label">⭐ Estrellas</td>
+                ${celda(renderEstrellas(p1.estrellas), gEstrellas === 1)}
+                ${celda(renderEstrellas(p2.estrellas), gEstrellas === 2)}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="compare-chart-wrap">
+          <h3 class="compare-chart-title">Valores nutricionales</h3>
+          <div class="compare-chart-legend">
+            <span class="legend-dot legend-dot--1"></span>${escHtml(p1.nombre)}
+            &nbsp;&nbsp;
+            <span class="legend-dot legend-dot--2"></span>${escHtml(p2.nombre)}
+          </div>
+          <canvas id="nutriChart"></canvas>
+        </div>`;
+    }
+
+    function buildChart(p1, p2) {
+      if (chartInstancia) {
+        chartInstancia.destroy();
+        chartInstancia = null;
+      }
+      const ctx = document.getElementById('nutriChart');
+      if (!ctx) return;
+
+      chartInstancia = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Proteína %', 'Grasa %', 'Humedad %'],
+          datasets: [
+            {
+              label: p1.nombre,
+              data: [p1.proteina ?? 0, p1.grasa ?? 0, p1.humedad ?? 0],
+              backgroundColor: '#3FB498',
+              borderRadius: 8,
+              borderSkipped: false,
+            },
+            {
+              label: p2.nombre,
+              data: [p2.proteina ?? 0, p2.grasa ?? 0, p2.humedad ?? 0],
+              backgroundColor: '#1D1D1B',
+              borderRadius: 8,
+              borderSkipped: false,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { font: { weight: '600' } }
+            },
+            y: {
+              beginAtZero: true,
+              max: 60,
+              grid: { color: '#dce3e7' },
+              ticks: {
+                callback: v => v + '%',
+                font: { size: 11 }
+              }
+            }
+          }
+        }
+      });
     }
 
     // ── Eliminar producto ────────────────────────────────────
@@ -316,7 +586,7 @@
       mostrarProductos(filtroActual);
     }
 
-    // ── Formulario ───────────────────────────────────────────
+    // ── Formulario agregar ───────────────────────────────────
     function abrirFormulario() {
       document.getElementById('productoModal').style.display = 'flex';
       document.getElementById('f-marca').focus();
@@ -355,14 +625,13 @@
       cerrarFormulario();
       mostrarProductos(filtroActual);
 
-      // Scroll al nuevo producto
       setTimeout(() => {
         const cards = document.querySelectorAll('.card');
         if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     }
 
-    // Preview de imagen al escribir URL
+    // Preview imagen en formulario
     document.getElementById('f-imagen').addEventListener('input', function() {
       const preview = document.getElementById('imgPreview');
       if (this.value.trim()) {
@@ -373,9 +642,12 @@
       }
     });
 
-    // Cerrar modal al hacer click fuera
+    // Cerrar modales al hacer click en el overlay
     document.getElementById('productoModal').addEventListener('click', function(e) {
       if (e.target === this) cerrarFormulario();
+    });
+    document.getElementById('comparacionModal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarComparacion();
     });
 
     // ── Filtros ──────────────────────────────────────────────
