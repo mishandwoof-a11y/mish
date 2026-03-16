@@ -6,6 +6,7 @@
   <title>mish&amp;woof · Comparador de Balanceados</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -28,10 +29,15 @@
   <main class="main">
 
     <!-- ── FILTROS ────────────────────────────────────────── -->
+    <input type="file" id="xlsxInput" accept=".xlsx,.xls" style="display:none"
+           onchange="importarExcel(this)">
     <section class="filters" aria-label="Filtrar por mascota">
       <button class="filter-btn active" data-filter="todos">Todos</button>
       <button class="filter-btn" data-filter="perro">🐶 Perros</button>
       <button class="filter-btn" data-filter="gato">🐱 Gatos</button>
+      <span class="filters__spacer"></span>
+      <button class="btn--outline-sm" onclick="descargarPlantilla()" title="Descargar plantilla Excel">📥 Plantilla</button>
+      <button class="btn--outline-sm" onclick="document.getElementById('xlsxInput').click()" title="Importar desde Excel">📤 Importar Excel</button>
     </section>
 
     <p class="results-count" id="resultsCount"></p>
@@ -796,6 +802,119 @@
 
     // ── Render inicial ───────────────────────────────────────
     mostrarProductos('todos');
+
+    // ── Importar desde Excel ─────────────────────────────────
+    function importarExcel(input) {
+      const file = input.files[0];
+      if (!file) return;
+      input.value = '';
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const wb   = XLSX.read(e.target.result, { type: 'array' });
+          const ws   = wb.Sheets[wb.SheetNames[0]];
+          const filas = XLSX.utils.sheet_to_json(ws, { defval: '' });
+          procesarFilasExcel(filas);
+        } catch (err) {
+          alert('Error al leer el archivo Excel. Asegurate de usar la plantilla correcta.');
+          console.error(err);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function normalizarMascota(val) {
+      const s = String(val).trim().toLowerCase();
+      if (s === 'gato' || s === 'cat') return 'gato';
+      return 'perro';
+    }
+
+    function procesarFilasExcel(filas) {
+      let agregados = 0, duplicados = 0, errores = 0;
+
+      const baseKeys = new Set(
+        PRODUCTOS.map(p => `${p.marca}|${p.nombre}|${p.mascota}`.toLowerCase())
+      );
+      const userKeys = new Set(
+        productosUsuario.map(p => `${p.marca}|${p.nombre}|${p.mascota}`.toLowerCase())
+      );
+
+      filas.forEach((fila, rowIdx) => {
+        const get = (key) => {
+          const found = Object.keys(fila).find(k => k.trim().toLowerCase() === key.toLowerCase());
+          return found !== undefined ? fila[found] : '';
+        };
+
+        const nombre = String(get('Nombre') || '').trim();
+        const marca  = String(get('Marca')  || '').trim();
+        if (!nombre || !marca) return;
+
+        const precioRaw = parseFloat(get('Precio/kg') || 0);
+        const protRaw   = parseFloat(get('Proteínas (%)') || get('Proteinas (%)') || get('Proteína (%)') || 0);
+        if (isNaN(precioRaw) || precioRaw <= 0 || isNaN(protRaw)) { errores++; return; }
+
+        const mascota = normalizarMascota(get('Mascota'));
+        const key     = `${marca}|${nombre}|${mascota}`.toLowerCase();
+        if (baseKeys.has(key) || userKeys.has(key)) { duplicados++; return; }
+
+        const estRaw    = parseInt(get('Estrellas (1-5)') || get('Estrellas (1–5)') || 3);
+        const estrellas = Math.max(1, Math.min(5, isNaN(estRaw) ? 3 : estRaw));
+
+        const nuevo = {
+          id:           Date.now().toString() + '_' + rowIdx,
+          userAdded:    true,
+          ingredientes: '',
+          mascota,
+          marca,
+          nombre,
+          precio_kg:    precioRaw,
+          proteina:     protRaw,
+          grasa:        parseFloat(get('Grasas (%)') || 0) || 0,
+          humedad:      parseFloat(get('Humedad (%)') || 0) || 0,
+          sabor:        String(get('Sabor') || '').trim(),
+          tamano_bolso: parseFloat(get('Tamaño bolso (kg)') || '') || null,
+          tamano:       String(get('Raza dirigida') || '').trim(),
+          estrellas,
+          imagen:       '',
+        };
+
+        productosUsuario.push(nuevo);
+        userKeys.add(key);
+        agregados++;
+      });
+
+      if (agregados > 0) guardarUsuario();
+      mostrarProductos(filtroActual);
+
+      const partes = [];
+      if (agregados > 0)  partes.push(`${agregados} producto${agregados !== 1 ? 's' : ''} importado${agregados !== 1 ? 's' : ''}`);
+      if (duplicados > 0) partes.push(`${duplicados} duplicado${duplicados !== 1 ? 's' : ''} omitido${duplicados !== 1 ? 's' : ''}`);
+      if (errores > 0)    partes.push(`${errores} fila${errores !== 1 ? 's' : ''} con errores (faltan datos requeridos)`);
+      alert(partes.length ? partes.join(' · ') : 'No se encontraron filas válidas en el archivo.');
+    }
+
+    // ── Descargar plantilla Excel ────────────────────────────
+    function descargarPlantilla() {
+      const headers = [
+        'Mascota', 'Marca', 'Nombre', 'Precio/kg', 'Sabor',
+        'Tamaño bolso (kg)', 'Proteínas (%)', 'Grasas (%)',
+        'Humedad (%)', 'Raza dirigida', 'Estrellas (1-5)'
+      ];
+      const ejemplos = [
+        ['perro', 'Royal Canin', 'Adult Medium Breed', 12500, 'Pollo', 15, 28, 14, 10, 'Razas medianas (11–25 kg)', 5],
+        ['gato',  'Purina Pro Plan', 'Indoor Adult Salmón', 14200, 'Salmón', 7.5, 35, 15, 8, 'Gatos adultos de interior', 5],
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...ejemplos]);
+      ws['!cols'] = [
+        { wch: 8 }, { wch: 16 }, { wch: 24 }, { wch: 10 }, { wch: 14 },
+        { wch: 16 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 28 }, { wch: 14 }
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Productos');
+      XLSX.writeFile(wb, 'plantilla-productos.xlsx');
+    }
   </script>
 
 </body>
