@@ -77,9 +77,21 @@
 
         <!-- Imagen -->
         <div class="form-group form-group--full">
-          <label class="form-label" for="f-imagen">Imagen (URL)</label>
-          <input class="form-input" type="url" id="f-imagen" name="imagen"
-                 placeholder="https://ejemplo.com/imagen.jpg">
+          <label class="form-label">Imagen</label>
+          <div class="form-img-tabs">
+            <button type="button" class="img-tab img-tab--active" id="tab-url"
+                    onclick="switchImgTab('url')">🔗 URL</button>
+            <button type="button" class="img-tab" id="tab-file"
+                    onclick="switchImgTab('file')">📁 Subir foto de la PC</button>
+          </div>
+          <div id="img-panel-url">
+            <input class="form-input" type="url" id="f-imagen" name="imagen"
+                   placeholder="https://ejemplo.com/imagen.jpg">
+          </div>
+          <div id="img-panel-file" style="display:none">
+            <input class="form-input" type="file" id="f-imagen-file" accept="image/*">
+            <p class="form-hint">Seleccioná una foto de tu computadora</p>
+          </div>
           <div class="form-img-preview" id="imgPreview"></div>
         </div>
 
@@ -173,7 +185,7 @@
           <button type="button" class="btn btn--secondary" onclick="cerrarFormulario()">
             Cancelar
           </button>
-          <button type="submit" class="btn btn--primary">
+          <button type="submit" class="btn btn--primary" id="btnSubmitForm">
             Agregar producto
           </button>
         </div>
@@ -199,8 +211,9 @@
 
   <script>
     // ── Constantes ──────────────────────────────────────────
-    const MAXIMOS = { proteina: 50, grasa: 30, humedad: 20 };
-    const LS_KEY  = 'mishwoof_user_productos';
+    const MAXIMOS    = { proteina: 50, grasa: 30, humedad: 20 };
+    const LS_KEY     = 'mishwoof_user_productos';
+    const LS_EDITS   = 'mishwoof_edits';
 
     // ── Productos usuario ────────────────────────────────────
     function cargarUsuario() {
@@ -211,8 +224,20 @@
       localStorage.setItem(LS_KEY, JSON.stringify(productosUsuario));
     }
 
-    let productosUsuario = cargarUsuario();
-    let filtroActual     = 'todos';
+    // ── Ediciones de productos base ──────────────────────────
+    function cargarEdits() {
+      try { return JSON.parse(localStorage.getItem(LS_EDITS)) || {}; }
+      catch (e) { return {}; }
+    }
+    function guardarEdits() {
+      localStorage.setItem(LS_EDITS, JSON.stringify(productosEditados));
+    }
+
+    let productosUsuario  = cargarUsuario();
+    let productosEditados = cargarEdits();
+    let filtroActual      = 'todos';
+    let editandoId        = null;   // null = agregar, string = editar
+    let imagenActual      = '';     // URL o base64 de la imagen en el form
 
     // ── Estado de comparación ────────────────────────────────
     let comparacion    = [];   // 0, 1 o 2 productos seleccionados
@@ -253,6 +278,8 @@
                 onerror="this.outerHTML='<div class=card__img-placeholder>${emoji}</div>'">`
         : `<div class="card__img-placeholder">${emoji}</div>`;
 
+      const editBtnHtml = `<button class="card__edit" onclick="abrirEditar('${p.id}')"
+                 title="Editar producto" aria-label="Editar ${escHtml(p.nombre)}">✏</button>`;
       const deleteBtnHtml = p.userAdded
         ? `<button class="card__delete" onclick="eliminarProducto('${p.id}')"
                    title="Eliminar producto" aria-label="Eliminar ${escHtml(p.nombre)}">✕</button>`
@@ -270,6 +297,7 @@
           <div class="card__image-wrap">
             ${imgHtml}
             <span class="card__badge card__badge--${p.mascota}">${badgeLabel}</span>
+            ${editBtnHtml}
             ${deleteBtnHtml}
           </div>
           <div class="card__body">
@@ -316,7 +344,12 @@
       filtroActual = filtro;
       limpiarComparacion(false); // resetear selección sin cerrar modal si está abierto
 
-      const todos = [...PRODUCTOS, ...productosUsuario];
+      const baseConIds = PRODUCTOS.map((p, i) => {
+        const id  = 'base_' + i;
+        const edit = productosEditados[id];
+        return edit ? { ...p, ...edit, id, esBase: true } : { ...p, id, esBase: true };
+      });
+      const todos = [...baseConIds, ...productosUsuario];
       const lista = filtro === 'todos' ? todos : todos.filter(p => p.mascota === filtro);
 
       // Asignar índice transitorio para comparación
@@ -588,58 +621,160 @@
 
     // ── Formulario agregar ───────────────────────────────────
     function abrirFormulario() {
+      editandoId = null;
+      imagenActual = '';
+      document.getElementById('modalTitle').textContent    = 'Agregar producto';
+      document.getElementById('btnSubmitForm').textContent = 'Agregar producto';
       document.getElementById('productoModal').style.display = 'flex';
       document.getElementById('f-marca').focus();
     }
 
     function cerrarFormulario() {
+      editandoId   = null;
+      imagenActual = '';
       document.getElementById('productoModal').style.display = 'none';
       document.getElementById('productoForm').reset();
-      document.getElementById('imgPreview').innerHTML = '';
+      document.getElementById('imgPreview').innerHTML    = '';
+      document.getElementById('f-imagen-file').value    = '';
+      document.getElementById('modalTitle').textContent    = 'Agregar producto';
+      document.getElementById('btnSubmitForm').textContent = 'Agregar producto';
+      switchImgTab('url');
     }
 
     function agregarProducto(e) {
       e.preventDefault();
       const f = e.target;
 
-      const nuevo = {
-        id:           Date.now().toString(),
-        userAdded:    true,
+      const datos = {
         mascota:      f.mascota.value,
-        imagen:       f.imagen.value.trim(),
+        imagen:       imagenActual || f.imagen.value.trim(),
         marca:        f.marca.value.trim(),
         nombre:       f.nombre.value.trim(),
-        precio_kg:    parseFloat(f.precio_kg.value) || 0,
-        proteina:     parseFloat(f.proteina.value)  || 0,
-        grasa:        parseFloat(f.grasa.value)     || 0,
-        humedad:      parseFloat(f.humedad.value)   || 0,
+        precio_kg:    parseFloat(f.precio_kg.value)    || 0,
+        proteina:     parseFloat(f.proteina.value)     || 0,
+        grasa:        parseFloat(f.grasa.value)        || 0,
+        humedad:      parseFloat(f.humedad.value)      || 0,
         sabor:        f.sabor.value.trim(),
         tamano_bolso: parseFloat(f.tamano_bolso.value) || null,
         tamano:       f.tamano.value.trim(),
-        estrellas:    parseInt(f.estrellas.value)   || 5,
-        ingredientes: '',
+        estrellas:    parseInt(f.estrellas.value)      || 5,
       };
 
-      productosUsuario.push(nuevo);
-      guardarUsuario();
+      const esNuevo = !editandoId;
+
+      if (editandoId) {
+        if (editandoId.startsWith('base_')) {
+          productosEditados[editandoId] = { ...datos };
+          guardarEdits();
+        } else {
+          const idx = productosUsuario.findIndex(p => p.id === editandoId);
+          if (idx !== -1) {
+            productosUsuario[idx] = { ...productosUsuario[idx], ...datos };
+            guardarUsuario();
+          }
+        }
+      } else {
+        productosUsuario.push({
+          id:           Date.now().toString(),
+          userAdded:    true,
+          ingredientes: '',
+          ...datos,
+        });
+        guardarUsuario();
+      }
+
       cerrarFormulario();
       mostrarProductos(filtroActual);
 
-      setTimeout(() => {
-        const cards = document.querySelectorAll('.card');
-        if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+      if (esNuevo) {
+        setTimeout(() => {
+          const cards = document.querySelectorAll('.card');
+          if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
     }
 
-    // Preview imagen en formulario
-    document.getElementById('f-imagen').addEventListener('input', function() {
+    // ── Editar producto ──────────────────────────────────────
+    function abrirEditar(id) {
+      let p;
+      if (id.startsWith('base_')) {
+        const idx = parseInt(id.replace('base_', ''));
+        if (!PRODUCTOS[idx]) return;
+        p = { ...PRODUCTOS[idx], id, esBase: true };
+        if (productosEditados[id]) p = { ...p, ...productosEditados[id] };
+      } else {
+        p = productosUsuario.find(x => x.id === id);
+        if (!p) return;
+      }
+
+      editandoId = id;
+      document.getElementById('modalTitle').textContent    = 'Editar producto';
+      document.getElementById('btnSubmitForm').textContent = 'Guardar cambios';
+
+      document.getElementById('f-mascota').value    = p.mascota     || 'perro';
+      document.getElementById('f-marca').value      = p.marca       || '';
+      document.getElementById('f-nombre').value     = p.nombre      || '';
+      document.getElementById('f-precio').value     = p.precio_kg   || '';
+      document.getElementById('f-proteina').value   = p.proteina    || '';
+      document.getElementById('f-grasa').value      = p.grasa       || '';
+      document.getElementById('f-humedad').value    = p.humedad     || '';
+      document.getElementById('f-sabor').value      = p.sabor       || '';
+      document.getElementById('f-bolso').value      = p.tamano_bolso|| '';
+      document.getElementById('f-tamano').value     = p.tamano      || '';
+      document.getElementById('f-estrellas').value  = p.estrellas   || 5;
+
+      imagenActual = p.imagen || '';
+      if (imagenActual) {
+        if (imagenActual.startsWith('data:')) {
+          switchImgTab('file');
+        } else {
+          document.getElementById('f-imagen').value = imagenActual;
+          switchImgTab('url');
+        }
+        mostrarPreview(imagenActual);
+      } else {
+        switchImgTab('url');
+      }
+
+      document.getElementById('productoModal').style.display = 'flex';
+    }
+
+    // ── Tabs imagen ──────────────────────────────────────────
+    function switchImgTab(tab) {
+      const isUrl = tab === 'url';
+      document.getElementById('img-panel-url').style.display  = isUrl ? ''     : 'none';
+      document.getElementById('img-panel-file').style.display = isUrl ? 'none' : '';
+      document.getElementById('tab-url').classList.toggle('img-tab--active', isUrl);
+      document.getElementById('tab-file').classList.toggle('img-tab--active', !isUrl);
+    }
+
+    // ── Preview imagen ───────────────────────────────────────
+    function mostrarPreview(src) {
       const preview = document.getElementById('imgPreview');
-      if (this.value.trim()) {
-        preview.innerHTML = `<img src="${escHtml(this.value.trim())}" alt="Preview"
+      if (src) {
+        preview.innerHTML = `<img src="${escHtml(src)}" alt="Preview"
           onerror="this.parentElement.innerHTML='<span class=preview-error>No se pudo cargar la imagen</span>'">`;
       } else {
         preview.innerHTML = '';
       }
+    }
+
+    // Preview imagen en formulario (URL)
+    document.getElementById('f-imagen').addEventListener('input', function() {
+      imagenActual = this.value.trim();
+      mostrarPreview(imagenActual);
+    });
+
+    // Preview imagen en formulario (archivo)
+    document.getElementById('f-imagen-file').addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        imagenActual = e.target.result;
+        mostrarPreview(imagenActual);
+      };
+      reader.readAsDataURL(file);
     });
 
     // Cerrar modales al hacer click en el overlay

@@ -525,15 +525,14 @@ body {
   color: var(--color-text);
 }
 
-/* ── Botón eliminar en tarjetas ──────────────────────────── */
+/* ── Botones editar / eliminar en tarjetas ───────────────── */
+.card__edit,
 .card__delete {
   position: absolute;
   top: 10px;
-  left: 10px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(220, 38, 38, 0.85);
   color: white;
   border: none;
   font-size: 0.75rem;
@@ -546,13 +545,60 @@ body {
   line-height: 1;
 }
 
+.card__edit {
+  left: 10px;
+  background: rgba(63, 180, 152, 0.9);
+}
+
+.card__delete {
+  left: 44px;
+  background: rgba(220, 38, 38, 0.85);
+}
+
+.card:hover .card__edit,
 .card:hover .card__delete {
   opacity: 1;
+}
+
+.card__edit:hover {
+  background: #2e9077;
+  transform: scale(1.1);
 }
 
 .card__delete:hover {
   background: #b91c1c;
   transform: scale(1.1);
+}
+
+/* ── Tabs URL / Subir foto ───────────────────────────────── */
+.form-img-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.img-tab {
+  padding: 6px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.img-tab--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
 }
 
 /* ── Botón Comparar en tarjeta ───────────────────────────── */
