@@ -336,7 +336,7 @@ body {
 /* ── Botón flotante agregar (FAB) ────────────────────────── */
 .fab {
   position: fixed;
-  bottom: 28px;
+  bottom: 96px;
   right: 28px;
   z-index: 900;
   width: 56px;
@@ -870,6 +870,257 @@ body {
 .legend-dot--1 { background: #3FB498; }
 .legend-dot--2 { background: #1D1D1B; }
 
+/* ── Header: acciones de sesión ──────────────────────────────── */
+.header__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.header-user__greeting {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.header-user__greeting strong {
+  color: var(--color-primary);
+}
+
+.header-user__badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(63,180,152,0.15);
+  padding: 5px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
+.header-user__login {
+  padding: 8px 20px;
+  border-radius: 100px;
+  border: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.header-user__login:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.header-user__logout {
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.header-user__logout:hover {
+  border-color: rgba(255,255,255,0.55);
+  color: var(--color-white);
+}
+
+.header-user__admin {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: transparent;
+  color: rgba(255,255,255,0.35);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.header-user__admin:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Modal Auth ───────────────────────────────────────────────── */
+.modal__box--auth {
+  max-width: 420px;
+}
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 28px;
+  gap: 4px;
+}
+
+.auth-tab {
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+
+.auth-tab:hover {
+  color: var(--color-primary);
+}
+
+.auth-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.auth-tab--admin {
+  margin-left: auto;
+  font-size: 1rem;
+  padding: 12px 10px;
+  color: rgba(100,100,100,0.5);
+}
+
+.auth-tab--admin:hover {
+  color: var(--color-text-muted);
+}
+
+.auth-tab--admin.auth-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.auth-panel {
+  padding: 24px 28px 28px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form .form-actions {
+  border-top: none;
+  margin-top: 4px;
+  padding-top: 0;
+}
+
+.auth-error {
+  font-size: 0.82rem;
+  color: #dc2626;
+  min-height: 1.2em;
+}
+
+.auth-admin-hint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 10px 0 4px;
+}
+
+/* ── WhatsApp CTA ─────────────────────────────────────────────── */
+.whatsapp-cta {
+  background: var(--color-dark);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.whatsapp-cta__inner {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.whatsapp-cta__emoji {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.whatsapp-cta__title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--color-white);
+  line-height: 1.25;
+}
+
+.whatsapp-cta__sub {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.whatsapp-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 16px 36px;
+  border-radius: 100px;
+  background: #25D366;
+  color: var(--color-white);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 24px rgba(37,211,102,0.45);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.whatsapp-cta__btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 32px rgba(37,211,102,0.6);
+}
+
+.whatsapp-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* ── Botón flotante WhatsApp ──────────────────────────────────── */
+.whatsapp-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 950;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(37,211,102,0.55);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.whatsapp-float svg {
+  width: 28px;
+  height: 28px;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(37,211,102,0.7);
+}
+
 /* ── Botones de importación Excel ────────────────────────────── */
 .filters__spacer {
   flex: 1;
@@ -964,5 +1215,28 @@ body {
   .btn--outline-sm {
     flex: 1;
     text-align: center;
+  }
+
+  .header__actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-left: 0;
+  }
+
+  .whatsapp-cta__title {
+    font-size: 1.3rem;
+  }
+
+  .whatsapp-cta__btn {
+    padding: 14px 28px;
+    font-size: 0.95rem;
+  }
+
+  .auth-panel {
+    padding: 20px 20px 24px;
+  }
+
+  .auth-tabs {
+    padding: 0 20px;
   }
 }
