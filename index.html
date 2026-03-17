@@ -23,6 +23,7 @@
         <h1>Comparador de Balanceados</h1>
         <p>Encontrá el alimento ideal para tu mascota</p>
       </div>
+      <div class="header__actions" id="headerUser"></div>
     </div>
   </header>
 
@@ -36,8 +37,8 @@
       <button class="filter-btn" data-filter="perro">🐶 Perros</button>
       <button class="filter-btn" data-filter="gato">🐱 Gatos</button>
       <span class="filters__spacer"></span>
-      <button class="btn--outline-sm" onclick="descargarPlantilla()" title="Descargar plantilla Excel">📥 Plantilla</button>
-      <button class="btn--outline-sm" onclick="document.getElementById('xlsxInput').click()" title="Importar desde Excel">📤 Importar Excel</button>
+      <button class="btn--outline-sm admin-only" style="display:none" onclick="descargarPlantilla()" title="Descargar plantilla Excel">📥 Plantilla</button>
+      <button class="btn--outline-sm admin-only" style="display:none" onclick="document.getElementById('xlsxInput').click()" title="Importar desde Excel">📤 Importar Excel</button>
     </section>
 
     <p class="results-count" id="resultsCount"></p>
@@ -50,6 +51,23 @@
     </div>
 
   </main>
+
+  <!-- ── SECCIÓN WHATSAPP ──────────────────────────────────── -->
+  <section class="whatsapp-cta">
+    <div class="whatsapp-cta__inner">
+      <p class="whatsapp-cta__emoji">🐾</p>
+      <h2 class="whatsapp-cta__title">¿Encontraste el balanceado ideal para tu mascota?</h2>
+      <p class="whatsapp-cta__sub">¡Conseguilo en nuestra tienda!</p>
+      <a class="whatsapp-cta__btn"
+         href="https://wa.me/543516322656?text=Hola%21%20Vi%20la%20comparadora%20de%20balanceados%20y%20quiero%20consultar"
+         target="_blank" rel="noopener noreferrer">
+        <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+        Consultar por WhatsApp
+      </a>
+    </div>
+  </section>
 
   <!-- ── FOOTER ─────────────────────────────────────────────── -->
   <footer class="footer">
@@ -64,8 +82,18 @@
     <button class="compare-bar__cancel" onclick="limpiarComparacion()">✕ Cancelar</button>
   </div>
 
+  <!-- ── BOTÓN FLOTANTE WHATSAPP ───────────────────────────── -->
+  <a class="whatsapp-float"
+     href="https://wa.me/543516322656?text=Hola%21%20Vi%20la%20comparadora%20de%20balanceados%20y%20quiero%20consultar"
+     target="_blank" rel="noopener noreferrer"
+     title="Consultar por WhatsApp" aria-label="Consultar por WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+  </a>
+
   <!-- ── BOTÓN FLOTANTE AGREGAR ────────────────────────────── -->
-  <button class="fab" id="fabBtn" onclick="abrirFormulario()" title="Agregar producto">
+  <button class="fab" id="fabBtn" onclick="abrirFormulario()" title="Agregar producto" style="display:none">
     +
   </button>
 
@@ -212,6 +240,102 @@
     </div>
   </div>
 
+  <!-- ── MODAL AUTENTICACIÓN ────────────────────────────────── -->
+  <div class="modal" id="authModal" style="display:none;"
+       role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal__box modal__box--auth">
+      <div class="modal__header">
+        <h2 class="modal__title" id="authTitle">Acceder</h2>
+        <button class="modal__close" onclick="cerrarAuth()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab auth-tab--active" id="auth-tab-login"
+                onclick="mostrarTabAuth('login')">Iniciar sesión</button>
+        <button class="auth-tab" id="auth-tab-register"
+                onclick="mostrarTabAuth('register')">Registrarse</button>
+        <button class="auth-tab auth-tab--admin" id="auth-tab-admin"
+                onclick="mostrarTabAuth('admin')" title="Administrador">⚙</button>
+      </div>
+
+      <!-- Panel: Login -->
+      <div id="auth-panel-login" class="auth-panel">
+        <form id="authForm" class="auth-form" onsubmit="loginUsuario(event)">
+          <div class="form-group">
+            <label class="form-label" for="auth-email">Email</label>
+            <input class="form-input" type="email" id="auth-email" required
+                   placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="auth-pass">Contraseña</label>
+            <input class="form-input" type="password" id="auth-pass" required
+                   placeholder="Tu contraseña">
+          </div>
+          <p class="auth-error" id="authError"></p>
+          <div class="form-actions">
+            <button type="button" class="btn btn--secondary" onclick="cerrarAuth()">Cancelar</button>
+            <button type="submit" class="btn btn--primary">Ingresar</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Panel: Registro -->
+      <div id="auth-panel-register" class="auth-panel" style="display:none">
+        <form id="authRegForm" class="auth-form" onsubmit="registrarUsuario(event)">
+          <div class="form-group">
+            <label class="form-label" for="reg-nombre">Nombre *</label>
+            <input class="form-input" type="text" id="reg-nombre" required
+                   placeholder="Tu nombre">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email *</label>
+            <input class="form-input" type="email" id="reg-email" required
+                   placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-pass">Contraseña *</label>
+            <input class="form-input" type="password" id="reg-pass" required
+                   minlength="6" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-mascota">Tipo de mascota</label>
+            <select class="form-input form-select" id="reg-mascota">
+              <option value="perro">🐶 Perro</option>
+              <option value="gato">🐱 Gato</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-telefono">Teléfono</label>
+            <input class="form-input" type="tel" id="reg-telefono"
+                   placeholder="Ej: 3516322656">
+          </div>
+          <p class="auth-error" id="authRegError"></p>
+          <div class="form-actions">
+            <button type="button" class="btn btn--secondary" onclick="cerrarAuth()">Cancelar</button>
+            <button type="submit" class="btn btn--primary">Crear cuenta</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Panel: Admin -->
+      <div id="auth-panel-admin" class="auth-panel" style="display:none">
+        <form id="authAdminForm" class="auth-form" onsubmit="loginAdmin(event)">
+          <p class="auth-admin-hint">Acceso exclusivo para administradores del sitio</p>
+          <div class="form-group">
+            <label class="form-label" for="admin-pass">Contraseña de administrador</label>
+            <input class="form-input" type="password" id="admin-pass" required
+                   placeholder="Contraseña de acceso">
+          </div>
+          <p class="auth-error" id="authAdminError"></p>
+          <div class="form-actions">
+            <button type="button" class="btn btn--secondary" onclick="cerrarAuth()">Cancelar</button>
+            <button type="submit" class="btn btn--primary">Acceder</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Datos base de productos -->
   <script src="products.js"></script>
 
@@ -244,6 +368,22 @@
     let filtroActual      = 'todos';
     let editandoId        = null;   // null = agregar, string = editar
     let imagenActual      = '';     // URL o base64 de la imagen en el form
+
+    // ── Auth: constantes, sesión y rol ───────────────────────
+    const LS_USUARIOS = 'mishwoof_usuarios';
+    const LS_SESION   = 'mishwoof_sesion';
+    const ADMIN_PASS  = 'admin123';
+
+    let usuarios = (function() {
+      try { return JSON.parse(localStorage.getItem(LS_USUARIOS)) || []; }
+      catch(e) { return []; }
+    })();
+    let sesionActual = (function() {
+      try { return JSON.parse(localStorage.getItem(LS_SESION)) || null; }
+      catch(e) { return null; }
+    })();
+
+    function esAdmin() { return !!(sesionActual && sesionActual.rol === 'admin'); }
 
     // ── Estado de comparación ────────────────────────────────
     let comparacion    = [];   // 0, 1 o 2 productos seleccionados
@@ -284,9 +424,11 @@
                 onerror="this.outerHTML='<div class=card__img-placeholder>${emoji}</div>'">`
         : `<div class="card__img-placeholder">${emoji}</div>`;
 
-      const editBtnHtml = `<button class="card__edit" onclick="abrirEditar('${p.id}')"
-                 title="Editar producto" aria-label="Editar ${escHtml(p.nombre)}">✏</button>`;
-      const deleteBtnHtml = p.userAdded
+      const editBtnHtml = esAdmin()
+        ? `<button class="card__edit" onclick="abrirEditar('${p.id}')"
+                   title="Editar producto" aria-label="Editar ${escHtml(p.nombre)}">✏</button>`
+        : '';
+      const deleteBtnHtml = (esAdmin() && p.userAdded)
         ? `<button class="card__delete" onclick="eliminarProducto('${p.id}')"
                    title="Eliminar producto" aria-label="Eliminar ${escHtml(p.nombre)}">✕</button>`
         : '';
@@ -619,6 +761,7 @@
 
     // ── Eliminar producto ────────────────────────────────────
     function eliminarProducto(id) {
+      if (!esAdmin()) return;
       if (!confirm('¿Eliminar este producto?')) return;
       productosUsuario = productosUsuario.filter(p => p.id !== id);
       guardarUsuario();
@@ -627,6 +770,7 @@
 
     // ── Formulario agregar ───────────────────────────────────
     function abrirFormulario() {
+      if (!esAdmin()) return;
       editandoId = null;
       imagenActual = '';
       document.getElementById('modalTitle').textContent    = 'Agregar producto';
@@ -702,6 +846,7 @@
 
     // ── Editar producto ──────────────────────────────────────
     function abrirEditar(id) {
+      if (!esAdmin()) return;
       let p;
       if (id.startsWith('base_')) {
         const idx = parseInt(id.replace('base_', ''));
@@ -802,9 +947,16 @@
 
     // ── Render inicial ───────────────────────────────────────
     mostrarProductos('todos');
+    actualizarUIAuth();
+
+    // Cerrar modal auth al click en overlay
+    document.getElementById('authModal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarAuth();
+    });
 
     // ── Importar desde Excel ─────────────────────────────────
     function importarExcel(input) {
+      if (!esAdmin()) return;
       const file = input.files[0];
       if (!file) return;
       input.value = '';
@@ -891,6 +1043,129 @@
       if (duplicados > 0) partes.push(`${duplicados} duplicado${duplicados !== 1 ? 's' : ''} omitido${duplicados !== 1 ? 's' : ''}`);
       if (errores > 0)    partes.push(`${errores} fila${errores !== 1 ? 's' : ''} con errores (faltan datos requeridos)`);
       alert(partes.length ? partes.join(' · ') : 'No se encontraron filas válidas en el archivo.');
+    }
+
+    // ── Auth: funciones completas ─────────────────────────────
+    function guardarUsuariosAuth() {
+      localStorage.setItem(LS_USUARIOS, JSON.stringify(usuarios));
+    }
+    function guardarSesion(sesion) {
+      if (sesion) localStorage.setItem(LS_SESION, JSON.stringify(sesion));
+      else localStorage.removeItem(LS_SESION);
+    }
+
+    function actualizarUIAuth() {
+      const headerUser   = document.getElementById('headerUser');
+      const fabBtn       = document.getElementById('fabBtn');
+      const adminOnlyEls = document.querySelectorAll('.admin-only');
+
+      if (sesionActual) {
+        if (sesionActual.rol === 'admin') {
+          headerUser.innerHTML = `
+            <span class="header-user__badge">⚙ Admin</span>
+            <button class="header-user__logout" onclick="cerrarSesion()">Salir</button>`;
+        } else {
+          headerUser.innerHTML = `
+            <span class="header-user__greeting">Hola, <strong>${escHtml(sesionActual.nombre)}</strong> ${sesionActual.mascota === 'gato' ? '🐱' : '🐶'}</span>
+            <button class="header-user__logout" onclick="cerrarSesion()">Cerrar sesión</button>`;
+        }
+      } else {
+        headerUser.innerHTML = `
+          <button class="header-user__login" onclick="abrirLogin()">Ingresar</button>
+          <button class="header-user__admin" onclick="abrirAdminLogin()" title="Acceso administrador">⚙</button>`;
+      }
+
+      fabBtn.style.display = esAdmin() ? '' : 'none';
+      adminOnlyEls.forEach(el => { el.style.display = esAdmin() ? '' : 'none'; });
+    }
+
+    function abrirLogin() {
+      document.getElementById('authModal').style.display = 'flex';
+      mostrarTabAuth('login');
+    }
+
+    function abrirAdminLogin() {
+      document.getElementById('authModal').style.display = 'flex';
+      mostrarTabAuth('admin');
+    }
+
+    function cerrarAuth() {
+      document.getElementById('authModal').style.display = 'none';
+      document.getElementById('authForm').reset();
+      document.getElementById('authRegForm').reset();
+      document.getElementById('authAdminForm').reset();
+      document.getElementById('authError').textContent      = '';
+      document.getElementById('authRegError').textContent   = '';
+      document.getElementById('authAdminError').textContent = '';
+    }
+
+    function mostrarTabAuth(tab) {
+      ['login', 'register', 'admin'].forEach(t => {
+        document.getElementById('auth-panel-' + t).style.display = t === tab ? '' : 'none';
+        const btn = document.getElementById('auth-tab-' + t);
+        if (btn) btn.classList.toggle('auth-tab--active', t === tab);
+      });
+      ['authError', 'authRegError', 'authAdminError'].forEach(id => {
+        document.getElementById(id).textContent = '';
+      });
+    }
+
+    function loginUsuario(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim().toLowerCase();
+      const pass  = document.getElementById('auth-pass').value;
+      const u = usuarios.find(u => u.email.toLowerCase() === email && u.password === pass);
+      if (!u) {
+        document.getElementById('authError').textContent = 'Email o contraseña incorrectos.';
+        return;
+      }
+      sesionActual = { nombre: u.nombre, email: u.email, mascota: u.mascota, telefono: u.telefono, rol: 'usuario' };
+      guardarSesion(sesionActual);
+      cerrarAuth();
+      actualizarUIAuth();
+      mostrarProductos(filtroActual);
+    }
+
+    function registrarUsuario(e) {
+      e.preventDefault();
+      const nombre   = document.getElementById('reg-nombre').value.trim();
+      const email    = document.getElementById('reg-email').value.trim().toLowerCase();
+      const pass     = document.getElementById('reg-pass').value;
+      const mascota  = document.getElementById('reg-mascota').value;
+      const telefono = document.getElementById('reg-telefono').value.trim();
+
+      if (usuarios.find(u => u.email.toLowerCase() === email)) {
+        document.getElementById('authRegError').textContent = 'Ya existe una cuenta con ese email.';
+        return;
+      }
+      usuarios.push({ nombre, email, password: pass, mascota, telefono });
+      guardarUsuariosAuth();
+      sesionActual = { nombre, email, mascota, telefono, rol: 'usuario' };
+      guardarSesion(sesionActual);
+      cerrarAuth();
+      actualizarUIAuth();
+      mostrarProductos(filtroActual);
+    }
+
+    function loginAdmin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('admin-pass').value;
+      if (pass !== ADMIN_PASS) {
+        document.getElementById('authAdminError').textContent = 'Contraseña incorrecta.';
+        return;
+      }
+      sesionActual = { nombre: 'Administrador', rol: 'admin' };
+      guardarSesion(sesionActual);
+      cerrarAuth();
+      actualizarUIAuth();
+      mostrarProductos(filtroActual);
+    }
+
+    function cerrarSesion() {
+      sesionActual = null;
+      guardarSesion(null);
+      actualizarUIAuth();
+      mostrarProductos(filtroActual);
     }
 
     // ── Descargar plantilla Excel ────────────────────────────
