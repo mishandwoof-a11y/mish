@@ -8,6 +8,8 @@ import CompareBar from './components/CompareBar'
 import ComparisonModal from './components/ComparisonModal'
 import ProductFormModal from './components/ProductFormModal'
 import AuthModal from './components/AuthModal'
+import WhatsAppButton from './components/WhatsAppButton'
+import Footer from './components/Footer'
 
 export default function App() {
   const { sesionActual, esAdmin, login, register, loginAdmin, logout, loading } = useAuth()
@@ -194,6 +196,9 @@ export default function App() {
           onCerrar={() => setShowAuthModal(false)}
         />
       )}
+
+      <Footer sesionActual={sesionActual} />
+      <WhatsAppButton sesionActual={sesionActual} />
     </>
   )
 }
