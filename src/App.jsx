@@ -10,7 +10,7 @@ import ProductFormModal from './components/ProductFormModal'
 import AuthModal from './components/AuthModal'
 
 export default function App() {
-  const { sesionActual, esAdmin, login, register, loginAdmin, logout } = useAuth()
+  const { sesionActual, esAdmin, login, register, loginAdmin, logout, loading } = useAuth()
   const { getListaCompleta, agregarProducto, editarProducto, eliminarProducto, importarExcel, descargarPlantilla } = useProducts()
 
   const [filtro, setFiltro]                 = useState('todos')
@@ -113,6 +113,8 @@ export default function App() {
   }
 
   const [cmpP1, cmpP2] = comparacion.length === 2 ? comparacion : [comparacion[0], null]
+
+  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.2rem', color: '#666' }}>Cargando...</div>
 
   return (
     <>
