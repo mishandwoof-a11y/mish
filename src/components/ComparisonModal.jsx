@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 import {
   Chart,
+  BarController,
   CategoryScale, LinearScale, BarElement,
   Tooltip, Legend
 } from 'chart.js'
 import { formatoPrecio, renderEstrellas } from '../utils/helpers'
 
-Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
+Chart.register(BarController, CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
 function ganador(v1, v2, lowerBetter = false) {
   if (v1 == null || v2 == null || v1 === v2) return null
@@ -38,6 +39,9 @@ export default function ComparisonModal({ p1, p2, onCerrar }) {
 
   useEffect(() => {
     if (!p1 || !p2 || !chartRef.current) return
+    // Chart.js v4 + React 18 StrictMode: destruir cualquier chart atado al canvas antes de crear uno nuevo
+    const existing = Chart.getChart(chartRef.current)
+    if (existing) existing.destroy()
     if (chartInst.current) { chartInst.current.destroy(); chartInst.current = null }
 
     chartInst.current = new Chart(chartRef.current, {
