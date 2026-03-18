@@ -299,6 +299,16 @@ body {
   line-height: 1.4;
 }
 
+/* Etiqueta de valoración */
+.card__rating-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
 /* Estrellas */
 .card__stars {
   font-size: 1.1rem;

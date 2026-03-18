@@ -68,6 +68,7 @@ export default function ProductCard({ producto, seleccionado, comparacionLlena, 
           </div>
         )}
 
+        <p className="card__rating-label">Valoración Mish&amp;Woof</p>
         <div className="card__stars" aria-label={`${p.estrellas} de 5 estrellas`}>
           {renderEstrellas(p.estrellas)}
         </div>
