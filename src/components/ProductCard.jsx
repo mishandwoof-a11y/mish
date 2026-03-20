@@ -56,8 +56,8 @@ export default function ProductCard({ producto, seleccionado, comparacionLlena, 
           {['proteina', 'grasa', 'humedad'].map(campo => (
             <div className="nutri-row" key={campo}>
               <span className="nutri-label">{campo.charAt(0).toUpperCase() + campo.slice(1)}</span>
-              <span className="nutri-value">{p[campo] ?? 0}%</span>
               <NutriBar valor={p[campo]} campo={campo} />
+              <span className="nutri-value">{p[campo] ?? 0}%</span>
             </div>
           ))}
         </div>
@@ -79,7 +79,7 @@ export default function ProductCard({ producto, seleccionado, comparacionLlena, 
           onClick={() => onComparar(p._cmpIdx)}
           aria-label={`Comparar ${p.nombre}`}
         >
-          ⚖ Comparar
+          + Comparar
         </button>
       </div>
     </article>

@@ -59,7 +59,7 @@ export default function ComparisonModal({ p1, p2, onCerrar }) {
           {
             label: p2.nombre,
             data: [p2.proteina ?? 0, p2.grasa ?? 0, p2.humedad ?? 0],
-            backgroundColor: '#1D1D1B',
+            backgroundColor: '#7d8fa3',
             borderRadius: 8,
             borderSkipped: false,
           },
