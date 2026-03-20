@@ -231,16 +231,16 @@ body {
   min-width: 0;
 }
 
-/* Tablet (≥ 640px): 2 columnas */
-@media (min-width: 640px) {
+/* Tablet (≥ 500px): 2 columnas */
+@media (min-width: 500px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 }
 
-/* Desktop (≥ 1024px): 3 columnas */
-@media (min-width: 1024px) {
+/* Desktop (≥ 768px): 3 columnas */
+@media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
