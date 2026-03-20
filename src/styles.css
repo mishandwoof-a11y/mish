@@ -223,14 +223,33 @@ body {
 }
 
 /* ── Grilla ──────────────────────────────────────────────────── */
+/* Mobile first: 1 columna */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Tablet (≥ 640px): 2 columnas */
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Desktop (≥ 1024px): 3 columnas */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
 }
 
 /* ── Tarjeta ─────────────────────────────────────────────────── */
 .card {
+  min-width: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -336,6 +355,7 @@ body {
   align-items: center;
   gap: 8px;
   font-size: 0.78rem;
+  min-width: 0;
 }
 
 .nutri-label {
@@ -1245,10 +1265,6 @@ body {
 
   .logo-main {
     font-size: 2rem;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
   }
 
   .product-form {
