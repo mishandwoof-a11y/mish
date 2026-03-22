@@ -1,33 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { db } from '../firebase'
 import { PRODUCTOS } from '../data/products'
 import * as XLSX from 'xlsx'
-
-const LS_KEY   = 'mishwoof_user_productos'
-const LS_EDITS = 'mishwoof_edits'
-
-function loadUserProducts() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY)) || [] }
-  catch { return [] }
-}
-function loadEdits() {
-  try { return JSON.parse(localStorage.getItem(LS_EDITS)) || {} }
-  catch { return {} }
-}
+import {
+  collection,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+} from 'firebase/firestore'
 
 export function useProducts() {
-  const [productosUsuario, setProductosUsuario]   = useState(loadUserProducts)
-  const [productosEditados, setProductosEditados] = useState(loadEdits)
+  const [productosUsuario, setProductosUsuario] = useState([])
+  const [productosEditados, setProductosEditados] = useState({})
 
-  function saveUserProducts(list) {
-    localStorage.setItem(LS_KEY, JSON.stringify(list))
-    setProductosUsuario(list)
-  }
-  function saveEdits(edits) {
-    localStorage.setItem(LS_EDITS, JSON.stringify(edits))
-    setProductosEditados(edits)
-  }
+  useEffect(() => {
+    const unsubProducts = onSnapshot(collection(db, 'productos'), (snap) => {
+      setProductosUsuario(snap.docs.map(d => ({ ...d.data(), id: d.id })))
+    })
+    const unsubEdits = onSnapshot(collection(db, 'productosEditados'), (snap) => {
+      const edits = {}
+      snap.docs.forEach(d => { edits[d.id] = d.data() })
+      setProductosEditados(edits)
+    })
+    return () => { unsubProducts(); unsubEdits() }
+  }, [])
 
-  /** Devuelve todos los productos (base + usuario) con id y _cmpIdx */
   function getListaCompleta(filtro) {
     const baseConIds = PRODUCTOS.map((p, i) => {
       const id   = 'base_' + i
@@ -39,50 +39,47 @@ export function useProducts() {
     return lista.map((p, i) => ({ ...p, _cmpIdx: i }))
   }
 
-  function agregarProducto(datos) {
-    const nuevo = {
-      id:           Date.now().toString(),
-      userAdded:    true,
+  async function agregarProducto(datos) {
+    await addDoc(collection(db, 'productos'), {
+      userAdded: true,
       ingredientes: '',
       ...datos,
-    }
-    saveUserProducts([...productosUsuario, nuevo])
+    })
   }
 
-  function editarProducto(id, datos) {
+  async function editarProducto(id, datos) {
     if (id.startsWith('base_')) {
-      saveEdits({ ...productosEditados, [id]: { ...datos } })
+      await setDoc(doc(db, 'productosEditados', id), datos)
     } else {
-      const lista = productosUsuario.map(p => p.id === id ? { ...p, ...datos } : p)
-      saveUserProducts(lista)
+      await updateDoc(doc(db, 'productos', id), datos)
     }
   }
 
-  function eliminarProducto(id) {
-    saveUserProducts(productosUsuario.filter(p => p.id !== id))
+  async function eliminarProducto(id) {
+    await deleteDoc(doc(db, 'productos', id))
   }
 
   function importarExcel(file, onDone) {
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const wb    = XLSX.read(e.target.result, { type: 'array' })
         const ws    = wb.Sheets[wb.SheetNames[0]]
         const filas = XLSX.utils.sheet_to_json(ws, { defval: '' })
-        const result = procesarFilas(filas)
+        const result = await procesarFilas(filas)
         onDone(result)
-      } catch (err) {
+      } catch {
         onDone({ error: 'Error al leer el archivo Excel. Asegurate de usar la plantilla correcta.' })
       }
     }
     reader.readAsArrayBuffer(file)
   }
 
-  function procesarFilas(filas) {
+  async function procesarFilas(filas) {
     let agregados = 0, duplicados = 0, errores = 0
     const baseKeys = new Set(PRODUCTOS.map(p => `${p.marca}|${p.nombre}|${p.mascota}`.toLowerCase()))
     const userKeys = new Set(productosUsuario.map(p => `${p.marca}|${p.nombre}|${p.mascota}`.toLowerCase()))
-    const nuevos = []
+    const promesas = []
 
     filas.forEach((fila, rowIdx) => {
       const get = (key) => {
@@ -104,8 +101,7 @@ export function useProducts() {
       const estRaw    = parseInt(get('Estrellas (1-5)') || get('Estrellas (1–5)') || 3)
       const estrellas = Math.max(1, Math.min(5, isNaN(estRaw) ? 3 : estRaw))
 
-      nuevos.push({
-        id:           Date.now().toString() + '_' + rowIdx,
+      const nuevo = {
         userAdded:    true,
         ingredientes: '',
         mascota,
@@ -120,12 +116,14 @@ export function useProducts() {
         tamano:       String(get('Raza dirigida') || '').trim(),
         estrellas,
         imagen:       '',
-      })
+        _rowIdx:      rowIdx,
+      }
       userKeys.add(key)
+      promesas.push(addDoc(collection(db, 'productos'), nuevo))
       agregados++
     })
 
-    if (nuevos.length > 0) saveUserProducts([...productosUsuario, ...nuevos])
+    await Promise.all(promesas)
 
     const partes = []
     if (agregados > 0)  partes.push(`${agregados} producto${agregados !== 1 ? 's' : ''} importado${agregados !== 1 ? 's' : ''}`)
