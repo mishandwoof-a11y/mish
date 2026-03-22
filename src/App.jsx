@@ -8,6 +8,7 @@ import CompareBar from './components/CompareBar'
 import ComparisonModal from './components/ComparisonModal'
 import ProductFormModal from './components/ProductFormModal'
 import AuthModal from './components/AuthModal'
+import WoofWidget from './components/WoofWidget'
 
 export default function App() {
   const { sesionActual, esAdmin, login, register, loginAdmin, logout } = useAuth()
@@ -192,6 +193,8 @@ export default function App() {
           onCerrar={() => setShowAuthModal(false)}
         />
       )}
+
+      <WoofWidget />
     </>
   )
 }
