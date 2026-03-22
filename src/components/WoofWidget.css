@@ -1,0 +1,422 @@
+/* ── WoofWidget — Variables ─────────────────────────────── */
+:root {
+  --woof-green: #1D9E75;
+  --woof-green-dark: #0F6E56;
+  --woof-green-light: #E1F5EE;
+  --woof-green-border: #9FE1CB;
+  --woof-green-text: #085041;
+  --woof-neutral: #444;
+  --woof-radius: 16px;
+}
+
+/* ── FAB ────────────────────────────────────────────────── */
+.woof-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--woof-green);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(29, 158, 117, 0.45);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  z-index: 9000;
+  padding: 0;
+}
+
+.woof-fab:hover {
+  background: var(--woof-green-dark);
+  box-shadow: 0 6px 24px rgba(29, 158, 117, 0.55);
+  transform: scale(1.05);
+}
+
+.woof-fab--open {
+  background: var(--woof-neutral) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+.woof-fab--open:hover {
+  background: #333 !important;
+}
+
+/* Badge */
+.woof-fab__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: #E03030;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* Tooltip */
+.woof-fab__tooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  background: #222;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.woof-fab__tooltip::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-left-color: #222;
+}
+
+.woof-fab:hover .woof-fab__tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ── Panel ──────────────────────────────────────────────── */
+.woof-panel {
+  position: fixed;
+  bottom: 110px;
+  right: 24px;
+  width: 320px;
+  max-height: 520px;
+  background: #fff;
+  border-radius: var(--woof-radius);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  z-index: 8999;
+  transform-origin: bottom right;
+  transform: scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
+  overflow: hidden;
+}
+
+.woof-panel--visible {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.woof-header {
+  background: var(--woof-green-light);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--woof-green-border);
+  flex-shrink: 0;
+}
+
+.woof-header__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.woof-header__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--woof-green-text);
+  line-height: 1.2;
+}
+
+.woof-header__sub {
+  font-size: 11px;
+  color: #4a7c6a;
+  margin-top: 2px;
+}
+
+.woof-header__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4a7c6a;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.woof-header__close:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #222;
+}
+
+/* ── Mensajes ───────────────────────────────────────────── */
+.woof-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 340px;
+  scroll-behavior: smooth;
+}
+
+.woof-messages::-webkit-scrollbar { width: 4px }
+.woof-messages::-webkit-scrollbar-track { background: transparent }
+.woof-messages::-webkit-scrollbar-thumb { background: var(--woof-green-border); border-radius: 4px }
+
+.woof-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.woof-msg--bot {
+  justify-content: flex-start;
+}
+
+.woof-msg--user {
+  justify-content: flex-end;
+}
+
+.woof-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--woof-green-light);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--woof-green-text);
+  overflow: hidden;
+}
+
+.woof-bubble {
+  max-width: 78%;
+  padding: 9px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  word-wrap: break-word;
+}
+
+.woof-bubble--bot {
+  background: #f0f0f0;
+  color: #1a1a1a;
+  border-radius: 14px 14px 14px 3px;
+}
+
+.woof-bubble--user {
+  background: var(--woof-green);
+  color: #fff;
+  border-radius: 14px 14px 3px 14px;
+}
+
+/* ── Chips ──────────────────────────────────────────────── */
+.woof-chips-wrap {
+  padding: 0 12px 6px 44px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.woof-chip {
+  border: 1.5px solid var(--woof-green);
+  background: var(--woof-green-light);
+  color: var(--woof-green-text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.woof-chip:hover:not(:disabled) {
+  background: var(--woof-green);
+  color: #fff;
+}
+
+.woof-chip:disabled {
+  opacity: 0.42;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Typing indicator ───────────────────────────────────── */
+.woof-typing {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.woof-typing__dots {
+  background: #f0f0f0;
+  border-radius: 14px 14px 14px 3px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.woof-typing__dot {
+  width: 6px;
+  height: 6px;
+  background: #999;
+  border-radius: 50%;
+  animation: woofBounce 1.2s infinite ease-in-out;
+}
+
+.woof-typing__dot:nth-child(2) { animation-delay: 0.2s }
+.woof-typing__dot:nth-child(3) { animation-delay: 0.4s }
+
+@keyframes woofBounce {
+  0%, 80%, 100% { transform: translateY(0) }
+  40%           { transform: translateY(-6px) }
+}
+
+/* ── Tarjetas de productos ──────────────────────────────── */
+.woof-products {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.woof-product-card {
+  border: 1.5px solid var(--woof-green-border);
+  border-radius: 10px;
+  padding: 9px 11px;
+  background: #fafffe;
+}
+
+.woof-product-card__name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--woof-green-text);
+  margin-bottom: 2px;
+}
+
+.woof-product-card__desc {
+  font-size: 11.5px;
+  color: #666;
+  line-height: 1.35;
+}
+
+/* WhatsApp btn */
+.woof-wa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.woof-wa-btn:hover {
+  background: #1aad53;
+}
+
+/* ── Input row ──────────────────────────────────────────── */
+.woof-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.woof-input {
+  flex: 1;
+  border: 1.5px solid #ddd;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.woof-input:focus {
+  border-color: var(--woof-green);
+}
+
+.woof-input::placeholder {
+  color: #aaa;
+}
+
+.woof-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--woof-green);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.woof-send-btn:hover {
+  background: var(--woof-green-dark);
+}
+
+.woof-send-btn:disabled {
+  background: #ccc;
+  cursor: default;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .woof-panel {
+    width: calc(100vw - 20px);
+    right: 10px;
+    bottom: 100px;
+  }
+
+  .woof-fab {
+    right: 14px;
+    bottom: 14px;
+  }
+}
