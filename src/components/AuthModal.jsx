@@ -16,16 +16,16 @@ export default function AuthModal({ tabInicial = 'login', onLogin, onRegister, o
   const [adminPass, setAdminPass]   = useState('')
   const [adminError, setAdminError] = useState('')
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault()
-    const err = onLogin(loginEmail, loginPass)
+    const err = await onLogin(loginEmail, loginPass)
     if (err) setLoginError(err)
     else onCerrar()
   }
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
     e.preventDefault()
-    const err = onRegister(regNombre, regEmail, regPass, regMascota, regTelefono)
+    const err = await onRegister(regNombre, regEmail, regPass, regMascota, regTelefono)
     if (err) setRegError(err)
     else onCerrar()
   }

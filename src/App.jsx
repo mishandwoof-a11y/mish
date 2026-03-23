@@ -9,12 +9,16 @@ import ComparisonModal from './components/ComparisonModal'
 import ProductFormModal from './components/ProductFormModal'
 import AuthModal from './components/AuthModal'
 import WoofWidget from './components/WoofWidget'
+import WhatsAppButton from './components/WhatsAppButton'
+import Footer from './components/Footer'
 
 export default function App() {
-  const { sesionActual, esAdmin, login, register, loginAdmin, logout } = useAuth()
+  const { sesionActual, esAdmin, login, register, loginAdmin, logout, loading } = useAuth()
   const { getListaCompleta, agregarProducto, editarProducto, eliminarProducto, importarExcel, descargarPlantilla } = useProducts()
 
   const [filtro, setFiltro]                 = useState('todos')
+  const [busqueda, setBusqueda]             = useState('')
+  const [orden, setOrden]                   = useState(null)
   const [comparacion, setComparacion]       = useState([])
   const [showFormModal, setShowFormModal]   = useState(false)
   const [showAuthModal, setShowAuthModal]   = useState(false)
@@ -23,11 +27,32 @@ export default function App() {
   const [showCmpModal, setShowCmpModal]     = useState(false)
   const xlsxInputRef = useRef(null)
 
-  const lista = getListaCompleta(filtro)
+  const listaBase = getListaCompleta(filtro)
+
+  const lista = (() => {
+    let l = listaBase
+    if (busqueda.trim()) {
+      const q = busqueda.trim().toLowerCase()
+      l = l.filter(p =>
+        (p.nombre      || '').toLowerCase().includes(q) ||
+        (p.marca       || '').toLowerCase().includes(q) ||
+        (p.sabor       || '').toLowerCase().includes(q) ||
+        (p.ingredientes|| '').toLowerCase().includes(q)
+      )
+    }
+    if (orden === 'precio') {
+      l = [...l].sort((a, b) => (a.precio_kg ?? 0) - (b.precio_kg ?? 0))
+    } else if (orden === 'proteina') {
+      l = [...l].sort((a, b) => (b.proteina ?? 0) - (a.proteina ?? 0))
+    }
+    return l
+  })()
 
   // ── Filtro ───────────────────────────────────────────────
   function handleFilter(f) {
     setFiltro(f)
+    setBusqueda('')
+    setOrden(null)
     setComparacion([])
     setShowCmpModal(false)
   }
@@ -115,6 +140,8 @@ export default function App() {
 
   const [cmpP1, cmpP2] = comparacion.length === 2 ? comparacion : [comparacion[0], null]
 
+  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.2rem', color: '#666' }}>Cargando...</div>
+
   return (
     <>
       <Header
@@ -141,6 +168,10 @@ export default function App() {
           onFilter={handleFilter}
           onImportar={handleImportar}
           onDescargarPlantilla={descargarPlantilla}
+          busqueda={busqueda}
+          onBuscar={setBusqueda}
+          orden={orden}
+          onOrden={setOrden}
         />
 
         <section className="products" id="productsSection">
@@ -194,6 +225,8 @@ export default function App() {
         />
       )}
 
+      <Footer sesionActual={sesionActual} />
+      <WhatsAppButton sesionActual={sesionActual} />
       <WoofWidget />
     </>
   )
